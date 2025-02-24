@@ -130,8 +130,8 @@ export default function Home({ navigation }) {
             <Image source={UserProfile} style={styles.userProfileImg} />
           </View>
           <View style={styles.details}>
-            <Text style={styles.mesText}>Good morning John</Text>
-            <Text style={styles.tasksText}>4 Tasks remaining</Text>
+            <Text style={styles.mesText}>Good morning Hien</Text>
+            <Text style={styles.tasksText}>400 Tasks remaining</Text>
           </View>
         </View>
         <TouchableOpacity>
