@@ -1,20 +1,23 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { View, Text } from 'react-native'
+import React from 'react'
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import Navigation from './Navigation/Navigation'
+import InitialScreen from './Screens/InitialScreen/InitialScreen';
+import AddTask from './Screens/Task/AddTask';
+import Task from './Screens/Task/Task';
+
+const Stack = createStackNavigator();
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName='InitialScreen' screenOptions={{ headerShown: false }}>
+        <Stack.Screen name='InitialScreen' component={InitialScreen} />
+        <Stack.Screen name='MainNavigation' component={Navigation} />
+        <Stack.Screen name="AddTask" component={AddTask} />
+        <Stack.Screen name="Task" component={Task}/>
+      </Stack.Navigator>
+    </NavigationContainer>
+  )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
