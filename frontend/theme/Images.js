@@ -17,6 +17,7 @@ const AddImg = require("../assets/img/add.png");
 const PasswordImg = require("../assets/img/padlock.png");
 const searchImg =require("../assets/img/search.png");
 const calenderImg = require("../assets/img/calendar.png")
+const exclamationImg = require("../assets/img/exclamation.png");
 
 
 export {
@@ -38,5 +39,6 @@ export {
     AddImg,
     PasswordImg,
     searchImg,
-    calenderImg
+    calenderImg,
+    exclamationImg,
 }
