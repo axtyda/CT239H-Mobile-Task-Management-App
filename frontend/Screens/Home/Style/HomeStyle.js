@@ -113,12 +113,12 @@ export const styles = StyleSheet.create({
   upcomingTaskContainer: {
     // REMOVED flexDirection: 'row'
     backgroundColor: '#fff',
-    borderRadius: 10,
+    borderRadius: 15,
     borderWidth: 1,
     borderColor: '#ccc',
     padding: 10,
     marginRight: 10,
-    width: 180,
+    width: 200,
   },
   // New row style for top row (Task Name left + Circle right)
   upcomingTopRow: {
@@ -140,6 +140,8 @@ export const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: Fonts.BOLD,
     marginBottom: 5,
+    maxWidth: 150,
+    overflow: 'hidden',
   },
   taskDetails: {
     fontSize: 12,
@@ -190,14 +192,14 @@ export const styles = StyleSheet.create({
   allTaskContainer: {
     flexDirection: 'row',
     marginBottom: 10,
-    borderRadius: 10,
+    borderRadius: 20,
     borderWidth: 1,
     borderColor: '#ccc',
     backgroundColor: '#fff',
     overflow: 'hidden',
   },
   leftColorBar: {
-    width: 17,
+    width: 25,
     backgroundColor: 'red', // replaced dynamically
   },
   allTaskContent: {
@@ -220,6 +222,7 @@ export const styles = StyleSheet.create({
   filterContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    // backgroundColor:
     // remove flexWrap: 'wrap'
     // remove justifyContent: 'space-around'
     // you can add spacing if you want, e.g., paddingHorizontal: 5

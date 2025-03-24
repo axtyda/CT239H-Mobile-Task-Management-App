@@ -103,7 +103,7 @@ const wipeRealmData = async () => {
  */
 const ImportantTaskItem = ({ title, description, priorityLevel, dueDate }) => {
   return (
-    <View style={[styles.upcomingTaskContainer, { minHeight: 140 }]}>
+    <View style={[styles.upcomingTaskContainer, { minHeight: 120 }]}>
       <View style={{ flex: 1, justifyContent: 'space-between' }}>
         {/* TOP SECTION: Title, color circle, and description */}
         <View>
