@@ -3,7 +3,6 @@ import { View, Text, TouchableOpacity, Image, StatusBar } from 'react-native'
 import { InitialScreenStyle } from './Style/InitialScreenStyle'
 import { WelcomeImg } from '../../theme/Images'
 
-
 export default function InitialScreen({navigation}) {
   const goToHome = () => {
     navigation.navigate("MainNavigation")
@@ -15,14 +14,14 @@ export default function InitialScreen({navigation}) {
         <View style={InitialScreenStyle.mainContainer}>
           <View>
             <Image source={WelcomeImg} style={InitialScreenStyle.img} />
-          <View>
-            <Text style={InitialScreenStyle.text}> A Task manager you cannot trust</Text>
-            <Text style={InitialScreenStyle.textSub}> A workspace for 1 single person</Text>
-          </View>
+            <View>
+              <Text style={InitialScreenStyle.text}> A Task manager you cannot trust</Text>
+              <Text style={InitialScreenStyle.textSub}> A workspace for 1 single person</Text>
+            </View>
           </View>
           <TouchableOpacity style={InitialScreenStyle.btn} onPress={goToHome}> 
             <Text style={InitialScreenStyle.btnText}>Get Started!</Text>
-          </TouchableOpacity> //"Get Started" button
+          </TouchableOpacity>
         </View>
       </View>
     </>

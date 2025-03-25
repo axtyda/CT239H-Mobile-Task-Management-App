@@ -1,6 +1,5 @@
 import { StyleSheet } from 'react-native';
 import { Colors, Fonts } from '../../../theme';
-import { calendarHeight } from '../Task';
 
 export const styles = StyleSheet.create({
   taskView: {
@@ -88,7 +87,7 @@ export const styles = StyleSheet.create({
     color: 'white',
     paddingHorizontal: 10,
     borderRadius: 10,
-    backgroundColor: 'red',
+    // backgroundColor: 'red',
     alignItems: 'center',
   },
   taskDescription: {
@@ -142,7 +141,7 @@ export const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: Fonts.BOLD,
     color: '#555',
-    marginHorizontal: 5,
+    marginHorizontal: 47,
   },
   customCalendar: {
     backgroundColor: 'white',
@@ -212,14 +211,14 @@ export const styles = StyleSheet.create({
     fontFamily: Fonts.BOLD,
   },
   taskIndicator: {
-    width: 4,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: Fonts.BOLD,
-    color: '#555',
-    position: 'absolute',
-    bottom: 6,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: Colors.primary,
+    alignSelf: 'center',
+    marginTop: 2,
   },
+
   monthViewContainer: {
     paddingHorizontal: 5,
     paddingBottom: 15,

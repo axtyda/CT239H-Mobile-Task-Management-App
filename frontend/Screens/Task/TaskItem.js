@@ -13,6 +13,21 @@ const TaskItem = React.memo(({ item, onRefresh }) => {
     }
   };
 
+  // Get background color based on priority level
+  const getPriorityColor = (priorityLevel) => {
+    switch (priorityLevel) {
+      case 'Red':
+        return '#FF0000'; // Urgent and Important
+      case 'Yellow':
+        return '#FFD700'; // Not Urgent but Important
+      case 'Blue':
+        return '#0000FF'; // Urgent but Not Important
+      case 'Green':
+      default:
+        return '#008000'; // Not Urgent and Not Important
+    }
+  };
+
   // Check if startDate and dueDate are the same
   const isSameDate = item.startDate === item.dueDate;
 
@@ -20,7 +35,11 @@ const TaskItem = React.memo(({ item, onRefresh }) => {
     <View style={styles.taskPillContainer}>
       {/* Task Details */}
       <View style={styles.taskContentContainer}>
-        <Text style={styles.taskTitle}>{item.name}</Text>
+        <Text 
+          style={[styles.taskTitle, { backgroundColor: getPriorityColor(item.priorityLevel) }]}
+        >
+          {item.name}
+        </Text>
         <Text style={styles.taskDescription}>{item.task}</Text>
         {item.subGoals && item.subGoals.length > 0 && (
           <View>
