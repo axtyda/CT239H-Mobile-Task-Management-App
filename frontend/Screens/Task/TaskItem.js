@@ -1,30 +1,51 @@
-// TaskItem.js
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import { styles } from './Style/TaskStyle';
+import TaskService from '../../taskService';
 
-const TaskItem = React.memo(({ item }) => {
+const TaskItem = React.memo(({ item, onRefresh }) => {
+  const toggleSubGoal = async (taskId, subGoalId) => {
+    try {
+      await TaskService.updateSubGoal(taskId, subGoalId);
+      if (onRefresh) onRefresh();
+    } catch (error) {
+      console.error("Error updating subgoal:", error);
+    }
+  };
+
+  // Check if startDate and dueDate are the same
+  const isSameDate = item.startDate === item.dueDate;
+
   return (
     <View style={styles.taskPillContainer}>
-      {/* Right Section: Task Details */}
+      {/* Task Details */}
       <View style={styles.taskContentContainer}>
         <Text style={styles.taskTitle}>{item.name}</Text>
         <Text style={styles.taskDescription}>{item.task}</Text>
-        {item.subGoals && item.subGoals.length > 0 }
-      </View>
-
-      {/* subgoal */}
-      <View style={styles.subGoalsContainer}>
+        {item.subGoals && item.subGoals.length > 0 && (
+          <View>
             {item.subGoals.map((sub, index) => (
-              <Text key={index} style={styles.subGoalText}>
-                - {sub.name}
-              </Text>
+              <View key={index} style={styles.subGoalContainer}>
+                <Text style={styles.subGoalText}>{sub.name}</Text>
+                <TouchableOpacity
+                  style={styles.checkbox}
+                  onPress={() => toggleSubGoal(item.id, sub.subGoalId)}
+                >
+                  {sub.isCompleted && <View style={styles.checkboxTick} />}
+                </TouchableOpacity>
+              </View>
             ))}
-        </View>
-
-      {/* Left Bottom Section: Time and Date */}
+          </View>
+        )}
+      </View>
       <View style={styles.taskInfoContainer}>
-        <Text style={styles.taskDate}>Due: {item.dueDate}</Text>
+        <View style={styles.dateRow}>
+          {!isSameDate && (
+            <Text style={styles.taskDate}>Start: {item.startDate}</Text>
+          )}
+          {!isSameDate && <Text style={styles.dateSeparator}></Text>}
+          <Text style={styles.taskDate}>Due: {item.dueDate}</Text>
+        </View>
         <Text style={styles.taskTime}>{item.time}</Text>
       </View>
     </View>

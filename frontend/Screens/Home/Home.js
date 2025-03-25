@@ -72,6 +72,7 @@ const wipeRealmData = async () => {
         title: 'string',
         description: 'string',
         priorityColor: 'string',
+        startDate: 'date',
         dueDate: 'date',
         notificationType: 'string?',
         subGoals: { type: 'list', objectType: 'SubGoal' },
@@ -81,7 +82,7 @@ const wipeRealmData = async () => {
 
     const realm = await Realm.open({
       schema: [SubGoalSchema, TaskSchema],
-      schemaVersion: 4, // or higher if you already used 4
+      schemaVersion: 7, // or higher if you already used 4
       path: 'myCustomRealm.realm',
     });
     realm.write(() => {
@@ -181,6 +182,7 @@ export default function Home({ navigation }) {
       title: 'Buy Groceries',
       description: 'Milk, Bread, Eggs, and Fruits',
       priorityLevel: 'Red',
+      startDate: new Date(Date.now() + 8 * 60 * 60 * 1000),
       dueDate: new Date(Date.now() + 8 * 60 * 60 * 1000),
       notificationType: 'push',
       subGoals: [
@@ -279,7 +281,7 @@ export default function Home({ navigation }) {
             {/* Filter row */}
             <ScrollView
               horizontal
-              showsHorizontalScrollIndicator={true}
+              showsHorizontalScrollIndicator={false}
               style={styles.filterScrollView}
             >
               <View style={styles.filterContainer}>

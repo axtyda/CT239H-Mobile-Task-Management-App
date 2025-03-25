@@ -153,5 +153,14 @@ export const styles = StyleSheet.create({
     marginLeft: 10,
     borderRadius: 8,
   },
-  
+  dateTimeDisplay: {
+    backgroundColor: "#D3D3D3",
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 10,
+  },
 });

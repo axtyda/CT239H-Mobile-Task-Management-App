@@ -1,5 +1,5 @@
 import Realm from 'realm';
-import { SubGoalSchema, TaskSchema } from './realmSchema';
+import { SubGoalSchema, TaskSchema} from './realmSchema';
 
 const realmConfig = {
   schema: [SubGoalSchema, TaskSchema],
@@ -44,6 +44,7 @@ const TaskService = {
         description: task.description || '',
         priorityLevel: task.priorityLevel || 'Green', // Default to Green
         dueDate: task.dueDate || new Date(),
+        startDate: task.startDate || new Date(),
         notificationType: task.notificationType || '',
         subGoals: subGoalsList,
         createdAt: new Date(),
@@ -76,6 +77,31 @@ const TaskService = {
       }
     });
   },
+  
+  updateSubGoal: async (taskId, subGoalId) => {
+    const realm = await openRealm();
+    try {
+      realm.write(() => {
+        const task = realm.objectForPrimaryKey('Task', taskId);
+        if (!task) {
+          console.error("Task not found");
+          return;
+        }
+        // Use Realm's filtered query to get the specific subGoal
+        const subGoal = task.subGoals.filtered(`subGoalId == ${subGoalId}`)[0];
+        if (subGoal) {
+          subGoal.isCompleted = !subGoal.isCompleted;
+        } else {
+          console.error("SubGoal not found");
+        }
+      });
+    } catch (error) {
+      console.error("Error updating subgoal:", error);
+    } finally {
+      realm.close();
+    }
+  },
+
 
   // Delete a task
   deleteTask: async (id) => {

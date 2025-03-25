@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
 import { Colors, Fonts } from '../../../theme';
-import { calendarHeight } from '../Task'
+import { calendarHeight } from '../Task';
 
 export const styles = StyleSheet.create({
   taskView: {
@@ -60,33 +60,27 @@ export const styles = StyleSheet.create({
     borderRadius: 25
   },
   taskPillContainer: {
-    // overflow: 'hidden',
     flexDirection: 'column',
     backgroundColor: 'white',
     borderRadius: 20,
     padding: 15,
     marginHorizontal: 15,
     marginVertical: 8,
-    elevation: 3, // Android shadow
-    shadowColor: '#000', // iOS shadow
+    elevation: 3,
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 2,
-    // alignItems: 'stretch'
   },
   taskContentContainer: {
     flex: 1,
     flexDirection: 'column',
     alignItems: 'flex-start',
-    // paddingRight: 10,
-    // backgroundColor: 'white',
-    // minHeight: 100,
   },
   taskInfoContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: 'column',
     alignItems: 'flex-end',
-    backgroundColor: 'green',
+    marginTop: 8,
   },
   taskTitle: {
     fontSize: 18,
@@ -103,20 +97,30 @@ export const styles = StyleSheet.create({
     fontFamily: Fonts.MEDIUM,
     color: Colors.textSecondary || '#555',
     paddingHorizontal: 10,
+    marginBottom: 4,
     borderRadius: 10,
     backgroundColor: '#2222',
-    minWidth: 200,
+    minWidth: '60%',
+    flex: 1,
     alignItems: 'center',
   },
-  subGoalsContainer: {
-    marginTop: 5,
-    blackgroundColor: 'blue',
+  subGoalContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+    position: 'relative',
+    width: '90%',
+    backgroundColor: 'transparent',
+    paddingHorizontal: 7,
+    paddingVertical: 7,
+    borderRadius: 6,
   },
   subGoalText: {
     fontSize: 15,
     fontFamily: Fonts.REGULAR,
-    color: '#777',
-    backgroundColor: 'blue'
+    color: '#555',
+    minWidth: '85%',
+    backgroundColor: 'transparent',
   },
   taskTime: {
     fontSize: 14,
@@ -124,18 +128,24 @@ export const styles = StyleSheet.create({
     color: "#444",
   },
   taskDate: {
-    marginRight: 5,
     fontSize: 13,
     fontFamily: Fonts.BOLD,
     color: '#555' || '#555'
   },
-  
-  // Custom Calendar Styles
+  dateRow: { // Added for horizontal layout
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    flexWrap: 'wrap', // Allows wrapping if too long
+  },
+  dateSeparator: { // Added for the dashes
+    fontSize: 13,
+    fontFamily: Fonts.BOLD,
+    color: '#555',
+    marginHorizontal: 5,
+  },
   customCalendar: {
     backgroundColor: 'white',
-    // borderRadius: 15,
-    // overflow: 'hidden',
-    // marginBottom: 15,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -149,7 +159,6 @@ export const styles = StyleSheet.create({
   },
   calendarToggle: {
     paddingVertical: 10,
-    // height: 100
   },
   weekViewContainer: {
     paddingHorizontal: 5,
@@ -206,7 +215,8 @@ export const styles = StyleSheet.create({
     width: 4,
     height: 4,
     borderRadius: 2,
-    backgroundColor: Colors.primary || '#20bf55',
+    backgroundColor: Fonts.BOLD,
+    color: '#555',
     position: 'absolute',
     bottom: 6,
   },
@@ -240,7 +250,6 @@ export const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    // paddingVertical: 30,
   },
   emptyTaskText: {
     fontSize: 16,
@@ -252,22 +261,35 @@ export const styles = StyleSheet.create({
     overflow: 'hidden',
     marginBottom: 15,
     backgroundColor: 'white',
-    // optional shadow
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
     paddingVertical: 10,
-    // height: calendarHeight
   },
   downArrowIcon: {
     position: 'absolute',
     right: 15,
-    bottom: 5, // or top: 5, whichever you prefer
+    bottom: 5,
   },
   scrollContent: {
-    paddingBottom: 40, // Space for FAB button
-    gap: 8, // Space between items
+    paddingBottom: 40,
+    gap: 8,
+  },
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderWidth: 1,
+    borderColor: '#777',
+    borderRadius: 3,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 10,
+  },
+  checkboxTick: {
+    width: 14,
+    height: 14,
+    backgroundColor: '#4CAF50',
   },
 });

@@ -10,7 +10,7 @@ import {
   Platform,
   ScrollView
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { styles } from './Style/TaskStyle';
 import { notificationImg, UserProfile, AddImg } from '../../theme/Images';
 import TaskService from '../../taskService';
@@ -18,7 +18,6 @@ import TaskItem from './TaskItem';
 import { format } from 'date-fns';
 import Icon from 'react-native-vector-icons/Feather';
 
-// Enable LayoutAnimation on Android
 if (Platform.OS === 'android') {
   UIManager.setLayoutAnimationEnabledExperimental &&
     UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -27,7 +26,6 @@ if (Platform.OS === 'android') {
 export default function Task() {
   const navigation = useNavigation();
 
-  // State
   const [tasks, setTasks] = useState([]);
   const [items, setItems] = useState({});
   const [loading, setLoading] = useState(true);
@@ -37,7 +35,6 @@ export default function Task() {
   const [daysInMonth, setDaysInMonth] = useState([]);
   const [weekDays] = useState(['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']);
 
-  // Format tasks from API
   const formatTasks = useCallback((tasksArray) => {
     let formattedTasks = {};
     if (!Array.isArray(tasksArray)) return {};
@@ -45,12 +42,10 @@ export default function Task() {
     tasksArray.forEach((task) => {
       if (!task || !task.dueDate) return;
 
-      // Use local date components instead of ISO
       const year = task.dueDate.getUTCFullYear();
-      const month = task.dueDate.getUTCMonth() + 1; // UTC months are 0-based
+      const month = task.dueDate.getUTCMonth() + 1;
       const day = task.dueDate.getUTCDate();
       const dateKey = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
-
 
       if (!formattedTasks[dateKey]) {
         formattedTasks[dateKey] = [];
@@ -62,18 +57,14 @@ export default function Task() {
         task: task.description,
         subGoals: task.subGoals || [],
         dueDate: task.dueDate.toLocaleDateString(),
+        startDate: task.startDate.toLocaleDateString(), // Already formatted correctly
         dateObj: task.dueDate,
       });
     });
 
-    // Sort tasks by time
-    // Object.keys(formattedTasks).forEach((date) => {
-    //   formattedTasks[date].sort((a, b) => a.dateObj - b.dateObj);
-    // });
     return formattedTasks;
   }, []);
 
-  // Fetch tasks
   const fetchTasks = useCallback(async () => {
     setLoading(true);
     try {
@@ -90,23 +81,27 @@ export default function Task() {
     }
   }, [formatTasks]);
 
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchTasks();
+    }, [fetchTasks])
+  );
+
   useEffect(() => {
     fetchTasks();
   }, [fetchTasks]);
 
-  // Generate the monthly calendar data
   useEffect(() => {
     generateCalendarData(currentMonth);
   }, [currentMonth]);
 
   const generateCalendarData = (date) => {
     const year = date.getUTCFullYear();
-    const month = date.getUTCMonth(); // UTC month is 0-based
+    const month = date.getUTCMonth();
     const daysInMonthCount = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
     const firstDayOfMonth = new Date(Date.UTC(year, month, 1)).getUTCDay();
 
     let days = [];
-    // Previous month days
     const prevMonth = month === 0 ? 11 : month - 1;
     const prevMonthYear = month === 0 ? year - 1 : year;
     const prevMonthDays = new Date(prevMonthYear, prevMonth + 1, 0).getDate();
@@ -120,18 +115,16 @@ export default function Task() {
         isCurrentMonth: false,
       });
     }
-    // Current month days
     for (let i = 1; i <= daysInMonthCount; i++) {
       days.push({
         day: i,
         month,
         year,
-        date: new Date(Date.UTC(year, month, i)), // UTC date
+        date: new Date(Date.UTC(year, month, i)),
         isCurrentMonth: true,
       });
     }
-    // Next month days
-    const totalCells = 42; // 6 rows x 7 columns
+    const totalCells = 42;
     const remainingCells = totalCells - days.length;
     const nextMonth = month === 11 ? 0 : month + 1;
     const nextMonthYear = month === 11 ? year + 1 : year;
@@ -147,7 +140,6 @@ export default function Task() {
     setDaysInMonth(days);
   };
 
-  // Expand/Collapse with LayoutAnimation
   const expandCalendar = () => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setIsCalendarExpanded(true);
@@ -158,20 +150,17 @@ export default function Task() {
     setIsCalendarExpanded(false);
   };
 
-  // Select date
   const onDatePress = (date) => {
     const utcDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
     setSelectedDate(utcDate);
   };
 
-  // Tasks for selected date
   const getTasksForSelectedDate = useMemo(() => {
     if (!selectedDate) return [];
     const dateString = selectedDate.toISOString().split('T')[0];
     return items[dateString] || [];
   }, [items, selectedDate]);
 
-  // Check if a date has tasks
   const hasTask = (date) => {
     if (!date || !items) return false;
     const year = date.getUTCFullYear();
@@ -181,7 +170,6 @@ export default function Task() {
     return !!(items[dateKey] && items[dateKey].length > 0);
   };
 
-  // Render a single day cell
   const renderCalendarDay = (dayObj) => {
     if (!dayObj || !dayObj.date) return null;
     const isSelected =
@@ -215,7 +203,6 @@ export default function Task() {
     );
   };
 
-  // Collapsed: show the current week only + month/year
   const renderWeekView = () => {
     if (!selectedDate) return null;
     const currentDate = new Date(selectedDate);
@@ -237,9 +224,6 @@ export default function Task() {
 
     return (
       <View style={styles.weekViewContainer}>
-        {/* (Optional) Month/Year in Collapsed View */}
-        <View style={styles.monthYearContainer}>
-        </View>
         <View style={styles.weekDaysHeader}>
           {weekDays.map((wDay, index) => (
             <Text key={`weekday-${index}`} style={styles.weekDayText}>
@@ -258,7 +242,6 @@ export default function Task() {
     );
   };
 
-  // Expanded: show the full month grid
   const renderMonthlyCalendar = () => {
     if (!daysInMonth.length) return null;
     const weeks = [];
@@ -290,14 +273,12 @@ export default function Task() {
     );
   };
 
-  // Navigate to AddTask
   const goToTask = useCallback(() => {
     navigation.navigate('AddTask');
   }, [navigation]);
 
   return (
     <View style={{ flex: 1 }}>
-      {/* Header */}
       <View style={styles.taskView}>
         <View style={styles.profileView}>
           <Image source={UserProfile} style={styles.userProfile} />
@@ -314,7 +295,6 @@ export default function Task() {
         </TouchableOpacity>
       </View>
 
-      {/* Calendar / Agenda */}
       <View style={styles.calenderView}>
         {loading ? (
           <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -323,55 +303,50 @@ export default function Task() {
           </View>
         ) : (
           <View style={styles.mainCalenderView}>
-            {/* Collapsed vs Expanded */}
             {!isCalendarExpanded ? (
               <View style={styles.calendarContainer}>
-                {/* Week View */}
                 <TouchableOpacity onPress={expandCalendar}>
                   <Text style={styles.monthYearText}>
                     {format(currentMonth, 'MMMM yyyy')}
                   </Text>
                 </TouchableOpacity>
                 {renderWeekView()}
-
-                {/* Tap arrow to expand */}
               </View>
             ) : (
               <View style={styles.calendarContainer}>
-                {/* Tap text to collapse */}
                 <TouchableOpacity onPress={collapseCalendar}>
                   <Text style={styles.monthYearText}>
                     {format(currentMonth, 'MMMM yyyy')}
                   </Text>
                 </TouchableOpacity>
-
-                {/* Full Month View */}
                 {renderMonthlyCalendar()}
               </View>
             )}
 
-            {/* Tasks List */}
-              <View style={styles.taskListContainer}>
-                {getTasksForSelectedDate.length > 0 ? (
-                  <ScrollView
-                    contentContainerStyle={styles.scrollContent}
-                    showsVerticalScrollIndicator={true}
-                  >
-                    {getTasksForSelectedDate.map((task, index) => (
-                      <TaskItem key={`task-${task.id}-${index}`} item={task} />
-                    ))}
-                  </ScrollView>
-                ) : (
-                  <View style={styles.emptyTaskContainer}>
-                    <Text style={styles.emptyTaskText}>No tasks for this day</Text>
-                  </View>
-                )}
-              </View>
+            <View style={styles.taskListContainer}>
+              {getTasksForSelectedDate.length > 0 ? (
+                <ScrollView
+                  contentContainerStyle={styles.scrollContent}
+                  showsVerticalScrollIndicator={true}
+                >
+                  {getTasksForSelectedDate.map((task, index) => (
+                    <TaskItem
+                      key={`task-${task.id}-${index}`}
+                      item={task}
+                      onRefresh={fetchTasks}
+                    />
+                  ))}
+                </ScrollView>
+              ) : (
+                <View style={styles.emptyTaskContainer}>
+                  <Text style={styles.emptyTaskText}>No tasks for this day</Text>
+                </View>
+              )}
+            </View>
           </View>
         )}
       </View>
 
-      {/* FAB */}
       <TouchableOpacity onPress={goToTask} style={styles.stickyCircle}>
         <Image source={AddImg} style={styles.addImg} />
       </TouchableOpacity>

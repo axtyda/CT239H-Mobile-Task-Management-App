@@ -8,6 +8,7 @@ import {
   ScrollView,
   Platform,
   Alert,
+  Switch,
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Picker } from '@react-native-picker/picker';
@@ -28,10 +29,17 @@ export default function AddTask({ navigation }) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
 
+  // Start date/time
+  const initialDueDate = new Date();
+  const [startDate, setStartDate] = useState(new Date(initialDueDate));
+  const [showStartDatePicker, setShowStartDatePicker] = useState(false);
+  const [showStartTimePicker, setShowStartTimePicker] = useState(false);
+  const [isStartDateDisabled, setIsStartDateDisabled] = useState(false);
+
   // Due date/time
-  const [dueDate, setDueDate] = useState(new Date());
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [showTimePicker, setShowTimePicker] = useState(false);
+  const [dueDate, setDueDate] = useState(initialDueDate);
+  const [showDueDatePicker, setShowDueDatePicker] = useState(false);
+  const [showDueTimePicker, setShowDueTimePicker] = useState(false);
 
   // Notification type
   const [notificationType, setNotificationType] = useState('push');
@@ -55,45 +63,51 @@ export default function AddTask({ navigation }) {
     }
   };
 
-  // Date picker handler
-  const onDateChange = (event, selectedDate) => {
-    if (Platform.OS !== 'ios') {
-      setShowDatePicker(false);
-    }
+  // Start Date and Time handlers
+  const showStartPicker = () => {
+    if (isStartDateDisabled) setShowStartDatePicker(true);
+  };
+
+  const onStartDateChange = (event, selectedDate) => {
+    setShowStartDatePicker(false);
     if (selectedDate) {
-      // Keep the old time
-      const hours = dueDate.getHours();
-      const minutes = dueDate.getMinutes();
-
-      const newDateTime = new Date(selectedDate);
-      newDateTime.setHours(hours);
-      newDateTime.setMinutes(minutes);
-
-      setDueDate(newDateTime);
+      setStartDate(selectedDate);
+      setShowStartTimePicker(true);
     }
   };
 
-  // Time picker handler
-  const onTimeChange = (event, selectedTime) => {
-    if (Platform.OS !== 'ios') {
-      setShowTimePicker(false);
-    }
+  const onStartTimeChange = (event, selectedTime) => {
+    setShowStartTimePicker(false);
     if (selectedTime) {
-      // Keep the old date
-      const year = dueDate.getFullYear();
-      const month = dueDate.getMonth();
-      const day = dueDate.getDate();
-
-      const newDateTime = new Date(selectedTime);
-      newDateTime.setFullYear(year, month, day);
-
-      setDueDate(newDateTime);
+      const updatedDate = new Date(startDate);
+      updatedDate.setHours(selectedTime.getHours());
+      updatedDate.setMinutes(selectedTime.getMinutes());
+      setStartDate(updatedDate);
     }
   };
 
-  // Show pickers
-  const showDueDatePicker = () => setShowDatePicker(true);
-  const showDueTimePicker = () => setShowTimePicker(true);
+  // Due Date and Time handlers
+  const showDuePicker = () => {
+    setShowDueDatePicker(true);
+  };
+
+  const onDueDateChange = (event, selectedDate) => {
+    setShowDueDatePicker(false);
+    if (selectedDate) {
+      setDueDate(selectedDate);
+      setShowDueTimePicker(true);
+    }
+  };
+
+  const onDueTimeChange = (event, selectedTime) => {
+    setShowDueTimePicker(false);
+    if (selectedTime) {
+      const updatedDate = new Date(dueDate);
+      updatedDate.setHours(selectedTime.getHours());
+      updatedDate.setMinutes(selectedTime.getMinutes());
+      setDueDate(updatedDate);
+    }
+  };
 
   // Add sub-goal
   const addSubGoal = () => {
@@ -123,21 +137,26 @@ export default function AddTask({ navigation }) {
       Alert.alert('Missing Field', 'Due date/time is required.');
       return;
     }
+    if (!startDate) {
+      Alert.alert('Missing Field', 'Start date/time is required.');
+      return;
+    }
     if (!notificationType) {
       Alert.alert('Missing Field', 'Notification type is required.');
       return;
     }
 
     const newTask = {
+      id: Date.now(),
       title,
       description,
       priorityLevel,
+      startDate,
       dueDate,
       notificationType,
       subGoals,
+      createdAt: new Date(),
     };
-
-    console.log('Creating new task:', newTask);
 
     try {
       await TaskService.addTask(newTask);
@@ -206,52 +225,76 @@ export default function AddTask({ navigation }) {
         </View>
       </View>
 
-      {/* Due Date */}
+      {/* Start Date and Time */}
       <View style={styles.inputWrapper}>
-        <Text style={styles.label}>Due Date</Text>
-        <View style={styles.dateRow}>
-          <TextInput
-            style={styles.textInput}
-            value={dueDate.toDateString()} // e.g. "Mon Jun 26 2025"
-            placeholder="Select due date"
-            editable={false}
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <Text style={styles.label}>Start Date and Time</Text>
+          <Switch
+            value={isStartDateDisabled}
+            onValueChange={(value) => {
+              setIsStartDateDisabled(value);
+              if (value) setStartDate(new Date(dueDate));
+            }}
           />
-          <TouchableOpacity onPress={showDueDatePicker}>
-            <Image source={calenderImg} style={styles.calendarIcon} />
-          </TouchableOpacity>
         </View>
-        {showDatePicker && (
+        <TouchableOpacity
+          onPress={showStartPicker}
+          style={[
+            styles.dateTimeDisplay,
+            !isStartDateDisabled && { backgroundColor: '#E0E0E0', opacity: 0.6 }, // Disabled style
+          ]}
+          disabled={!isStartDateDisabled}
+        >
+          <Text style={{ flex: 1, fontSize: 14, fontFamily: 'regular' }}>
+            {startDate.toLocaleString()}
+          </Text>
+          <Image source={calenderImg} style={styles.calendarIcon} />
+        </TouchableOpacity>
+        {showStartDatePicker && (
+          <DateTimePicker
+            value={startDate}
+            mode="date"
+            is24Hour={true}
+            display="default"
+            onChange={onStartDateChange}
+          />
+        )}
+        {showStartTimePicker && (
+          <DateTimePicker
+            value={startDate}
+            mode="time"
+            is24Hour={true}
+            display="default"
+            onChange={onStartTimeChange}
+          />
+        )}
+      </View>
+
+      {/* Due Date and Time */}
+      <View style={styles.inputWrapper}>
+        <Text style={styles.label}>Due Date and Time</Text>
+        <TouchableOpacity onPress={showDuePicker} style={styles.dateTimeDisplay}>
+          <Text style={{ flex: 1, fontSize: 14, fontFamily: 'regular' }}>
+            {dueDate.toLocaleString()}
+          </Text>
+          <Image source={calenderImg} style={styles.calendarIcon} />
+        </TouchableOpacity>
+        {showDueDatePicker && (
           <DateTimePicker
             value={dueDate}
             mode="date"
             is24Hour={true}
             display="default"
-            onChange={onDateChange}
+            onChange={onDueDateChange}
           />
         )}
-      </View>
-
-      {/* Due Time */}
-      <View style={styles.inputWrapper}>
-        <Text style={styles.label}>Due Time</Text>
-        <View style={styles.dateRow}>
-          <TextInput
-            style={styles.textInput}
-            value={dueDate.toLocaleTimeString()} // e.g. "10:30:00 AM"
-            placeholder="Select due time"
-            editable={false}
-          />
-          <TouchableOpacity onPress={showDueTimePicker}>
-            <Image source={calenderImg} style={styles.calendarIcon} />
-          </TouchableOpacity>
-        </View>
-        {showTimePicker && (
+        {showDueTimePicker && (
           <DateTimePicker
             value={dueDate}
             mode="time"
             is24Hour={true}
             display="default"
-            onChange={onTimeChange}
+            onChange={onDueTimeChange}
           />
         )}
       </View>
@@ -283,8 +326,6 @@ export default function AddTask({ navigation }) {
             </TouchableOpacity>
           </View>
         ))}
-
-        {/* New sub-goal input */}
         <View style={styles.subGoalInputRow}>
           <TextInput
             style={styles.textInput}
