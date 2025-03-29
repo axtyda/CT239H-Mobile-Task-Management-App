@@ -1,22 +1,28 @@
 import { StyleSheet } from 'react-native';
-import { Colors, Fonts } from '../../../theme';
 
 export const styles = StyleSheet.create({
-  // Overall container
+  // Main container
   container: {
     flex: 1,
-    backgroundColor: Colors.primary, // so the top area is green
+    backgroundColor: '#F8F9FD',
   },
-
-  // Green header at the top
-  headerContainer: {
-    backgroundColor: Colors.primary,
-    paddingTop: 40,
-    paddingBottom: 30,
-    paddingHorizontal: 20,
+  
+  // Header styles
+  header: {
+    height: 100, // Set a fixed height
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    backgroundColor: '#2ED573',
+    padding: 16,
+    paddingTop: 30,
+    borderBottomLeftRadius: 16,
+    borderBottomRightRadius: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 3,
   },
   profileSection: {
     flexDirection: 'row',
@@ -26,223 +32,232 @@ export const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
   },
   profileText: {
-    marginLeft: 10,
+    marginLeft: 15,
   },
-  profileTitle: {
+  greeting: {
     fontSize: 18,
-    color: '#fff',
-    fontFamily: Fonts.BOLD,
+    fontWeight: 'bold',
+    color: 'white',
   },
-  profileName: {
+  subGreeting: {
     fontSize: 14,
-    color: '#fff',
-    fontFamily: Fonts.MEDIUM,
+    color: 'rgba(255, 255, 255, 0.8)',
   },
-  notiImg: {
-    width: 25,
-    height: 25,
-  },
-
-  // White container for the rest of the screen
-  mainContent: {
-    flex: 1,
-    backgroundColor: '#fff',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    marginTop: -10, // slightly overlap the green header
-    paddingHorizontal: 20,
-    paddingVertical: 20,
-  },
-
-  // Today Completion
-  todayCompletionCard: {
-    backgroundColor: '#c8facc',
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 20,
-  },
-  todayCompletionTitle: {
-    fontSize: 16,
-    color: '#000',
-    fontFamily: Fonts.BOLD,
-    marginBottom: 10,
-  },
-  progressBarContainer: {
-    position: 'relative',
-    marginTop: 5,
-  },
-  progressBarOuter: {
-    width: '100%',
-    height: 10,
-    backgroundColor: '#fff',
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: '#000',
-    overflow: 'hidden',
-  },
-  progressBarFill: {
-    height: '100%',
-    backgroundColor: 'green',
-    borderRadius: 5,
-  },
-  percentLabel: {
-    position: 'absolute',
-    right: 0,
-    top: -18,
-    fontSize: 14,
-    fontFamily: Fonts.BOLD,
-    color: '#000',
-  },
-
-  // Upcoming Tasks
-  upComings: {
-    marginBottom: 20,
-  },
-  upcoingText: {
-    fontSize: 18,
-    color: 'black',
-    fontFamily: Fonts.BOLD,
-    marginBottom: 10,
-  },
-
-  /**
-   * MINIMAL CHANGES for Upcoming Task Layout
-   */
-  upcomingTaskContainer: {
-    // REMOVED flexDirection: 'row'
-    backgroundColor: '#fff',
-    borderRadius: 15,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 10,
-    marginRight: 10,
-    width: 200,
-  },
-  // New row style for top row (Task Name left + Circle right)
-  upcomingTopRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 5,
-  },
-  // Emptied out so they don't affect layout
-  upcomingCircleCategory: {},
-  upcomingTextContainer: {},
-
-  categoryCircle: {
-    width: 15,
-    height: 15,
-    borderRadius: 7.5,
-  },
-  taskName: {
-    fontSize: 14,
-    fontFamily: Fonts.BOLD,
-    marginBottom: 5,
-    maxWidth: 150,
-    overflow: 'hidden',
-  },
-  taskDetails: {
-    fontSize: 12,
-    fontFamily: Fonts.MEDIUM,
-  },
-  statusBarContainer: {
-    height: 4,
-    backgroundColor: '#ccc',
-    marginTop: 4,
-    borderRadius: 2,
-    overflow: 'hidden',
-  },
-  statusBar: {
-    height: '100%',
-  },
-
-  // All Tasks
-  taskListView: {
-    marginBottom: 20,
-  },
-  filterContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  filterButton: {
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 5,
-    backgroundColor: Colors.secondary,
-    marginVertical: 5,
-  },
-  filterText: {
-    color: 'black',
-    fontFamily: Fonts.MEDIUM,
-  },
-  activeFilterButton: {
-    backgroundColor: Colors.primary,
-  },
-  activeFilterText: {
-    color: '#fff',
-    fontFamily: Fonts.MEDIUM,
-  },
-
-  // Individual Task Cards in All Task
-  allTaskContainer: {
-    flexDirection: 'row',
-    marginBottom: 10,
+  searchButton: {
+    width: 40,
+    height: 40,
     borderRadius: 20,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    backgroundColor: '#fff',
-    overflow: 'hidden',
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  leftColorBar: {
-    width: 25,
-    backgroundColor: 'red', // replaced dynamically
+  
+  // Header search styles 
+  headerSearchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: 10,
   },
-  allTaskContent: {
+  searchInputWrapper: {
+    height: 36, // Set a consistent height
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    borderRadius: 18,
+    paddingHorizontal: 12, // Smaller horizontal padding
     flex: 1,
-    padding: 10,
   },
-  topRow: {
+  headerSearchInput: {
+    flex: 1,
+    color: 'white',
+    marginLeft: 8,
+    fontSize: 15, // Slightly smaller font
+    height: 36, // Match container height
+    paddingVertical: 0, // Remove vertical padding
+  },
+  clearSearch: {
+    marginLeft: 8,
+  },
+  searchResultsContainer: {
+    marginBottom: 20,
+  },
+  
+  // Scroll container
+  scrollContainer: {
+    padding: 20,
+    paddingBottom: 100,
+  },
+  
+  // Card styles (common)
+  card: {
+    backgroundColor: 'white',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  
+  // Section titles
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#2F3542',
+    marginBottom: 16,
+  },
+  upcomingTitle: {
+    marginTop: 24,
+  },
+  
+  // Progress section
+  progressBar: {
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#F4F6FA',
+    overflow: 'hidden',
+    marginVertical: 12,
+  },
+  progressFill: {
+    height: '100%',
+    backgroundColor: '#2ED573',
+    borderRadius: 4,
+  },
+  progressText: {
+    fontSize: 14,
+    color: '#57606F',
+    textAlign: 'center',
+  },
+  
+  // Task card
+  taskCard: {
+    backgroundColor: 'white',
+    borderRadius: 16,
+    flexDirection: 'row',
+    marginBottom: 12,
+    padding: 16,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  priorityIndicator: {
+    width: 4,
+    height: 40,
+    borderRadius: 2,
+    marginRight: 12,
+  },
+  taskContent: {
+    flex: 1,
+  },
+  taskTitle: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#2F3542',
+    marginBottom: 4,
+  },
+  taskDescription: {
+    fontSize: 14,
+    color: '#57606F',
+    marginBottom: 8,
+    lineHeight: 20,
+  },
+  taskMeta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  taskTime: {
+    fontSize: 12,
+    color: '#57606F',
+    marginLeft: 4,
+    marginRight: 12,
+  },
+  metaItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  taskMetaText: {
+    fontSize: 12,
+    color: '#57606F',
+    marginLeft: 4,
+  },
+  
+  // Upcoming task cards
+  upcomingCard: {
+    backgroundColor: 'white',
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 12,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 5, // small spacing below the row
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
-  taskStatus: {
+  upcomingContent: {
+    flex: 1,
+    marginRight: 12,
+  },
+  upcomingDate: {
     fontSize: 12,
-    fontFamily: Fonts.MEDIUM, // or 'bold' if you prefer
+    color: '#57606F',
+    marginBottom: 4,
   },
-  filterScrollView: {
-    marginBottom: 10, // Adds space below the filter row
+  upcomingTaskTitle: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#2F3542',
   },
-  filterContainer: {
-    flexDirection: 'row',
+  upcomingPriority: {
+    width: 8,
+    height: 40,
+    borderRadius: 4,
+  },
+  
+  // Empty states and loaders
+  emptyText: {
+    fontSize: 16,
+    color: '#A4B0BE',
+    textAlign: 'center',
+    marginVertical: 20,
+    backgroundColor: 'white',
+    borderRadius: 16,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 1,
+  },
+  loader: {
+    marginVertical: 20,
+  },
+  
+  // Floating action button
+  fab: {
+    position: 'absolute',
+    bottom: 30,
+    right: 30,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#2ED573',
+    justifyContent: 'center',
     alignItems: 'center',
-    // backgroundColor:
-    // remove flexWrap: 'wrap'
-    // remove justifyContent: 'space-around'
-    // you can add spacing if you want, e.g., paddingHorizontal: 5
-  },
-  filterButton: {
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 5,
-    backgroundColor: Colors.secondary,
-    marginRight: 10, // add space between buttons
-  },
-  filterText: {
-    color: 'black',
-    fontFamily: Fonts.MEDIUM,
-  },
-  activeFilterButton: {
-    backgroundColor: Colors.primary,
-  },
-  activeFilterText: {
-    color: '#fff',
-    fontFamily: Fonts.MEDIUM,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 6,
   },
 });

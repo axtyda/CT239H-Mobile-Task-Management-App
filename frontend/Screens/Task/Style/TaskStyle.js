@@ -50,8 +50,13 @@ export const styles = StyleSheet.create({
   stickyCircle: {
     position: 'absolute',
     bottom: 30,
-    right: 25,
-    borderRadius: 25
+    right: 30,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#2ED573',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   addImg: {
     width: 60,

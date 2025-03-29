@@ -1,281 +1,341 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
+import { 
+  View, 
+  Text, 
+  ScrollView, 
+  TouchableOpacity, 
+  ActivityIndicator, 
   Image,
-  TouchableOpacity,
-  FlatList,
-  ScrollView,
-  Alert,
+  TextInput,
+  Animated 
 } from 'react-native';
+import { useIsFocused } from '@react-navigation/native';
+import dayjs from 'dayjs';
 import { styles } from './Style/HomeStyle';
-import { notificationImg, UserProfile } from '../../theme/Images';
 import TaskService from '../../taskService';
-import { wipeRealmData } from '../../realmSchema'
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import { UserProfile } from '../../theme/Images';
 
-/** -------------------------------
- *  Helper Functions
- * -------------------------------
- */
+const HomeScreen = ({ navigation }) => {
+  // State management
+  const [allTasks, setAllTasks] = useState([]);
+  const [todayTasks, setTodayTasks] = useState([]);
+  const [upcomingTasks, setUpcomingTasks] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchVisible, setSearchVisible] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const isFocused = useIsFocused();
+  const searchAnimation = new Animated.Value(0);
+  const profileAnimation = new Animated.Value(1);
 
-/**
- * Map the priorityLevel to a color code for the left bar.
- */
-const getPriorityBarColor = (priorityLevel) => {
-  switch (priorityLevel) {
-    case 'Red':
-      return '#FF0000'; // Urgent and Important
-    case 'Yellow':
-      return '#FFD700'; // Not Urgent but Important
-    case 'Blue':
-      return '#0000FF'; // Urgent but Not Important
-    case 'Green':
-    default:
-      return '#008000'; // Not Urgent and Not Important
-  }
-};
+  // Fetch tasks when screen is focused
+  useEffect(() => {
+    if (isFocused) fetchTasks();
+  }, [isFocused]);
 
-/** 
- * If you want to highlight tasks that are due in the next 12 hours,
- * we check `dueDate`.
- */
-const isWithin12Hours = (dueDate) => {
-  if (!dueDate) return false;
-  const now = new Date();
-  const end = new Date(dueDate);
-  const diffHours = (end - now) / (1000 * 60 * 60);
-  return diffHours > 0 && diffHours <= 12;
-};
+  // Animation for search field
+  useEffect(() => {
+    // Animation for search field expansion
+    Animated.parallel([
+      Animated.timing(searchAnimation, {
+        toValue: searchVisible ? 1 : 0,
+        duration: 250,
+        useNativeDriver: false,
+      }),
+      
+      // Animate profile section
+      Animated.timing(profileAnimation, {
+        toValue: searchVisible ? 0 : 1,
+        duration: 200,
+        useNativeDriver: false,
+      })
+    ]).start();
+  }, [searchVisible]);
 
-/**
- * Wipe all data from Realm using your new schema.
- * If you have a separate SubGoal schema, include it here as well.
+  // Get all tasks and filter them
+  const fetchTasks = async () => {
+    try {
+      const allTasksData = await TaskService.getAllTasks();
+      setAllTasks(allTasksData);
+      
+      const now = dayjs();
+      
+      // Filter tasks due today that aren't completed
+      const today = allTasksData.filter(task => 
+        dayjs(task.dueDate).isSame(now, 'day')
+      );
+      
+      // Filter upcoming tasks (not today, not completed)
+      const upcoming = allTasksData.filter(task => 
+        dayjs(task.dueDate).isAfter(now, 'day') && 
+        !dayjs(task.dueDate).isSame(now, 'day') &&
+        task.finishedStatus !== 'done'
+      ).slice(0, 5); // Limit to 5 upcoming tasks
 
-/** 
- * Important Task Item
- * We use a flex container with `justifyContent: 'space-between'`
- * and `minHeight` so the due date stays pinned at the bottom.
- */
-const ImportantTaskItem = ({ title, description, priorityLevel, dueDate }) => {
-  return (
-    <View style={[styles.upcomingTaskContainer, { minHeight: 120 }]}>
-      <View style={{ flex: 1, justifyContent: 'space-between' }}>
-        {/* TOP SECTION: Title, color circle, and description */}
-        <View>
-          <View
-            style={{ 
-              flexDirection: 'row', 
-              justifyContent: 'space-between', 
-              alignItems: 'center',
-            }}
-          >
-            <Text style={styles.taskName}>{title}</Text>
-            <View
-              style={[
-                styles.categoryCircle,
-                { backgroundColor: getPriorityBarColor(priorityLevel) },
-              ]}
-            />
-          </View>
-          <Text style={styles.taskDetails}>{description}</Text>
+      setTodayTasks(today);
+      setUpcomingTasks(upcoming);
+    } catch (error) {
+      console.error('Error fetching tasks:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle search functionality
+  const handleSearch = (text) => {
+    setSearchQuery(text);
+    
+    if (text.trim() === '') {
+      setSearchResults([]);
+      return;
+    }
+    
+    const results = allTasks.filter(task => 
+      task.title.toLowerCase().includes(text.toLowerCase())
+    );
+    
+    setSearchResults(results);
+  };
+
+  // Toggle search visibility
+  const toggleSearch = () => {
+    setSearchVisible(!searchVisible);
+    if (searchVisible) {
+      setSearchQuery('');
+      setSearchResults([]);
+    }
+  };
+
+  // Get the color based on priority level
+  const getPriorityColor = (level) => {
+    switch (level) {
+      case 'Red': return '#FF4757';
+      case 'Yellow': return '#FFD93D';
+      case 'Blue': return '#2F89FC';
+      case 'Green': return '#2ED573';
+      default: return '#A4B0BE';
+    }
+  };
+
+  // Component for progress header section
+  const ProgressHeader = () => {
+    // Count tasks that are fully completed (status = done)
+    const completedTasks = todayTasks.filter(t => t.finishedStatus === 'done').length;
+    const total = todayTasks.length;
+    
+    return (
+      <View style={styles.card}>
+        <Text style={styles.sectionTitle}>Today's Progress</Text>
+        <View style={styles.progressBar}>
+          <View 
+            style={[
+              styles.progressFill, 
+              { width: `${total > 0 ? (completedTasks/total)*100 : 0}%` }
+            ]}
+          />
         </View>
-
-        {/* BOTTOM SECTION: Due date */}
-        <Text style={styles.taskDetails}>
-          Due: {new Date(dueDate).toLocaleString()}
+        <Text style={styles.progressText}>
+          {completedTasks} of {total} tasks completed
         </Text>
       </View>
-    </View>
-  );
-};
+    );
+  };
 
-/**
- * Custom Task Item
- * For "All Tasks" list, shows a colored left bar (based on `priorityColor`)
- * plus the title, description, and due date.
- */
-const CustomTaskItem = ({ title, description, priorityLevel, dueDate }) => {
-  return (
-    <View style={styles.allTaskContainer}>
-      {/* Left color bar: map priorityLevel -> color */}
-      <View
+  // Component for individual task cards
+  const TaskCard = ({ task }) => (
+    <TouchableOpacity 
+      style={styles.taskCard}
+      onPress={() => navigation.navigate('Task', { taskId: task.id })}
+    >
+      <View 
         style={[
-          styles.leftColorBar,
-          { backgroundColor: getPriorityBarColor(priorityLevel) },
+          styles.priorityIndicator, 
+          { backgroundColor: getPriorityColor(task.priorityLevel) }
         ]}
       />
-      <View style={styles.allTaskContent}>
-        {/* Top row: Title */}
-        <View style={styles.topRow}>
-          <Text style={styles.taskName}>{title}</Text>
+      
+      <View style={styles.taskContent}>
+        <Text style={styles.taskTitle}>{task.title}</Text>
+        
+        {task.description && (
+          <Text style={styles.taskDescription} numberOfLines={2}>
+            {task.description}
+          </Text>
+        )}
+        
+        <View style={styles.taskMeta}>
+          <Icon name="access-time" size={16} color="#57606F" />
+          <Text style={styles.taskTime}>
+            {dayjs(task.dueDate).format('h:mm A')}
+          </Text>
+          
+          {task.subGoals.length > 0 && (
+            <View style={styles.metaItem}>
+              <Icon name="checklist" size={16} color="#57606F" />
+              <Text style={styles.taskMetaText}>
+                {task.subGoals.filter(sg => sg.isCompleted).length}/{task.subGoals.length}
+              </Text>
+            </View>
+          )}
         </View>
-        <Text style={styles.taskDetails}>{description}</Text>
-        <Text style={styles.taskDetails}>
-          {/* Priority label if desired */}
-        </Text>
-        <Text style={styles.taskDetails}>
-          Due: {new Date(dueDate).toLocaleString()}
-        </Text>
       </View>
-    </View>
-  );
-};
-
-/** 
- * Main Home Component
- */
-export default function Home({ navigation }) {
-  const [tasks, setTasks] = useState([]);
-  const [filteredTasks, setFilteredTasks] = useState([]);
-  const [activeTab, setActiveTab] = useState('All');
-
-  // Sample test data
-  // const addTestData = async () => {
-  //   // 1st Task (due in 8 hours)
-  //   await TaskService.addTask({
-  //     title: 'Buy Groceries',
-  //     description: 'Milk, Bread, Eggs, and Fruits',
-  //     priorityLevel: 'Red',
-  //     startDate: new Date(Date.now() + 8 * 60 * 60 * 1000),
-  //     dueDate: new Date(Date.now() + 8 * 60 * 60 * 1000),
-  //     notificationType: 'push',
-  //     subGoals: [
-  //       { subGoalId: Date.now(), name: 'Buy milk', isCompleted: false },
-  //     ],
-  //   });
-  // };
-
-  // Fetch tasks from Realm
-  const fetchTasks = async () => {
-    let allTasks = await TaskService.getAllTasks();
-    console.log('Fetched tasks:', JSON.stringify(allTasks, null, 2));
-    // If no tasks exist, add test data
-    // if (allTasks.length === 0) {
-    //   // await addTestData();
-    //   allTasks = await TaskService.getAllTasks();
-    // }
-
-    const plainTasks = Array.from(allTasks).map(task => ({
-      ...task,
-      subGoals: task.subGoals ? task.subGoals.map(sg => ({ ...sg })) : [],
-    }));
-
-    // Convert to a plain array
-    setTasks(plainTasks);
-    setFilteredTasks(plainTasks);
-  };
-
-  useEffect(() => {
-    fetchTasks();
-  }, []);
-
-  // Filter tasks (dummy logic since no 'status' field in new schema)
-  const filterTasks = (status) => {
-    if (status === 'All') {
-      setFilteredTasks([...tasks]);
-    } else {
-      Alert.alert('Note', 'No status field in the new schema—displaying all tasks.');
-      setFilteredTasks([...tasks]);
-    }
-    setActiveTab(status);
-  };
-
-  // Important tasks: check if due in next 12h
-  const importantTasks = tasks.filter(
-    (task) => isWithin12Hours(task.dueDate)
+    </TouchableOpacity>
   );
 
   return (
     <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.headerContainer}>
-        <View style={styles.profileSection}>
+      {/* Header Section with Integrated Search */}
+      <View style={styles.header}>
+        {/* Profile Section - Animated to hide when search is active */}
+        <Animated.View 
+          style={[
+            styles.profileSection,
+            {
+              opacity: profileAnimation,
+              width: profileAnimation.interpolate({
+                inputRange: [0, 1],
+                outputRange: [0, '80%']
+              }),
+              flex: profileAnimation
+            }
+          ]}
+        >
           <Image source={UserProfile} style={styles.userProfileImg} />
           <View style={styles.profileText}>
-            <Text style={styles.profileTitle}>Profile Details</Text>
-            <Text style={styles.profileName}>Quach Khoa Hien</Text>
+            <Text style={styles.greeting}>Hello, User!</Text>
+            <Text style={styles.subGreeting}>Your tasks today</Text>
           </View>
-        </View>
-
-        {/* Buttons in the header */}
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <TouchableOpacity onPress={wipeRealmData} style={{ marginRight: 10 }}>
-            <Text style={{ color: 'red' }}>Wipe Data</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={fetchTasks} style={{ marginRight: 10 }}>
-            <Text style={{ color: 'blue' }}>Refresh</Text>
-          </TouchableOpacity>
-          <TouchableOpacity>
-            <Image source={notificationImg} style={styles.notiImg} />
-          </TouchableOpacity>
-        </View>
+        </Animated.View>
+        
+        {/* Search Input - Animated to expand when search is active */}
+        <Animated.View
+          style={[
+            styles.headerSearchContainer,
+            {
+              flex: 0, // Don't use flex animation
+              width: searchAnimation.interpolate({
+                inputRange: [0, 1],
+                outputRange: [0, '85%']
+              }),
+              opacity: searchAnimation,
+              position: searchVisible ? 'absolute' : 'relative',
+              right: searchVisible ? 50 : 0,
+              height: 36, // Fixed height
+            }
+          ]}
+        >
+          <View style={styles.searchInputWrapper}>
+            <Icon name="search" size={18} color="rgba(255, 255, 255, 0.7)" />
+            <TextInput
+              style={styles.headerSearchInput}
+              placeholder="Search tasks..."
+              placeholderTextColor="rgba(255, 255, 255, 0.7)"
+              value={searchQuery}
+              onChangeText={handleSearch}
+              autoFocus={searchVisible}
+            />
+          </View>
+          
+          {/* Cancel search button */}
+          {searchQuery.length > 0 && (
+            <TouchableOpacity onPress={() => handleSearch('')} style={styles.clearSearch}>
+              <Icon name="close" size={18} color="white" />
+            </TouchableOpacity>
+          )}
+        </Animated.View>
+        
+        {/* Search Button */}
+        <TouchableOpacity style={styles.searchButton} onPress={toggleSearch}>
+          <Icon 
+            name={searchVisible ? "close" : "search"} 
+            size={24} 
+            color="white" 
+          />
+        </TouchableOpacity>
       </View>
 
       {/* Main Content */}
-      <View style={styles.mainContent}>
-        <ScrollView showsVerticalScrollIndicator={false}>
-          {/* Important Tasks (due < 12h) */}
-          <View style={styles.upComings}>
-            <Text style={styles.upcoingText}>Important</Text>
-            <FlatList
-              data={importantTasks}
-              horizontal
-              showsHorizontalScrollIndicator={true}
-              keyExtractor={(item) => item.id.toString()}
-              renderItem={({ item }) => (
-                <ImportantTaskItem
-                  title={item.title}
-                  description={item.description}
-                  priorityLevel={item.priorityLevel}
-                  dueDate={item.dueDate}
-                />
-              )}
-            />
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        {/* Search Results */}
+        {searchVisible && searchQuery.length > 0 && (
+          <View style={styles.searchResultsContainer}>
+            <Text style={styles.sectionTitle}>
+              Search Results ({searchResults.length})
+            </Text>
+            
+            {searchResults.length > 0 ? (
+              searchResults.map(task => (
+                <TaskCard key={task.id} task={task} />
+              ))
+            ) : (
+              <Text style={styles.emptyText}>No matching tasks found</Text>
+            )}
           </View>
+        )}
 
-          {/* All Tasks */}
-          <View style={styles.taskListView}>
-            <Text style={styles.upcoingText}>All Tasks</Text>
+        {/* Only show regular content when not searching or when search is empty */}
+        {(!searchVisible || searchQuery.length === 0) && (
+          <>
+            {/* Progress Section */}
+            <ProgressHeader />
 
-            {/* Filter row */}
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              style={styles.filterScrollView}
-            >
-              <View style={styles.filterContainer}>
-                {['All', 'Pending', 'In Progress', 'Done'].map((status) => (
-                  <TouchableOpacity
-                    key={status}
-                    onPress={() => filterTasks(status)}
-                    style={[styles.filterButton, activeTab === status && styles.activeFilterButton]}
-                  >
-                    <Text
-                      style={[
-                        styles.filterText,
-                        activeTab === status && styles.activeFilterText,
-                      ]}
-                    >
-                      {status}
+            {/* Today's Tasks Section */}
+            <Text style={styles.sectionTitle}>Today's Tasks</Text>
+            
+            {loading ? (
+              <ActivityIndicator size="large" color="#2ED573" style={styles.loader} />
+            ) : todayTasks.length > 0 ? (
+              todayTasks.map(task => (
+                <TaskCard key={task.id} task={task} />
+              ))
+            ) : (
+              <Text style={styles.emptyText}>No tasks for today! 🎉</Text>
+            )}
+
+            {/* Upcoming Tasks Section */}
+            <Text style={[styles.sectionTitle, styles.upcomingTitle]}>Upcoming Next</Text>
+            
+            {upcomingTasks.length > 0 ? (
+              upcomingTasks.map(task => (
+                <TouchableOpacity 
+                  key={task.id} 
+                  style={styles.upcomingCard}
+                  onPress={() => navigation.navigate('Task', { taskId: task.id })}
+                >
+                  <View style={styles.upcomingContent}>
+                    <Text style={styles.upcomingDate}>
+                      {dayjs(task.dueDate).format('ddd, MMM D')}
                     </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </ScrollView>
+                    <Text style={styles.upcomingTaskTitle} numberOfLines={1}>
+                      {task.title}
+                    </Text>
+                  </View>
+                  
+                  <View 
+                    style={[
+                      styles.upcomingPriority, 
+                      { backgroundColor: getPriorityColor(task.priorityLevel) }
+                    ]}
+                  />
+                </TouchableOpacity>
+              ))
+            ) : (
+              <Text style={styles.emptyText}>No upcoming tasks 📅</Text>
+            )}
+          </>
+        )}
+      </ScrollView>
 
-            {/* Render filtered tasks using CustomTaskItem */}
-            {filteredTasks.map((item) => (
-              <CustomTaskItem
-                key={item.id}
-                title={item.title}
-                description={item.description}
-                priorityLevel={item.priorityLevel}
-                dueDate={item.dueDate}
-              />
-            ))}
-          </View>
-        </ScrollView>
-      </View>
+      {/* Floating Action Button */}
+      <TouchableOpacity 
+        style={styles.fab}
+        onPress={() => navigation.navigate('AddTask')}
+      >
+        <Icon name="add" size={28} color="white" />
+      </TouchableOpacity>
     </View>
   );
-}
+};
+
+export default HomeScreen;

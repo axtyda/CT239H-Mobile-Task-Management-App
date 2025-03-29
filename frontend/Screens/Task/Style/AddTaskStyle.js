@@ -1,166 +1,211 @@
 import { StyleSheet } from 'react-native';
-import { Colors, Fonts } from '../../../theme'; // Adjust import paths as needed
 
 export const styles = StyleSheet.create({
-  /** Root container */
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: '#F8F9FD',
   },
-
-  /** Header bar */
+  scrollContainer: {
+    padding: 20,
+    paddingBottom: 100,
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.primary,
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 20,
+    backgroundColor: '#2ED573',
+    padding: 20,
+    borderBottomLeftRadius: 16,
+    borderBottomRightRadius: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 3,
+    marginBottom: 16,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: 'white',
+    marginLeft: 16,
+  },
+  backButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   backArrow: {
     width: 10,
     height: 20,
+    tintColor: 'white',
   },
-  headerTitle: {
+  card: {
+    backgroundColor: 'white',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  sectionTitle: {
     fontSize: 18,
-    color: 'white',
-    fontFamily: Fonts.BOLD,
-    marginLeft: 20, // Adjust for spacing
+    fontWeight: '600',
+    color: '#2F3542',
+    marginBottom: 16,
   },
-
-  /** Wrapper for each input block */
-  inputWrapper: {
-    marginHorizontal: 20,
-    marginTop: 15,
-    // color: 'black',
-  },
-  label: {
-    fontSize: 13,
-    color: 'black',
-    fontFamily: Fonts.BOLD,
-  },
-
-  /** Text inputs */
-  textInput: {
-    backgroundColor: "#D3D3D3",
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    marginTop: 10,
+  inputLabel: {
     fontSize: 14,
-    fontFamily: Fonts.REGULAR,
+    fontWeight: '500',
+    color: '#57606F',
+    marginBottom: 8,
   },
-
-  /** Picker styling */
+  textInput: {
+    backgroundColor: '#F4F6FA',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 16,
+    color: '#2F3542',
+    marginBottom: 16,
+  },
+  textAreaInput: {
+    backgroundColor: '#F4F6FA',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 16,
+    color: '#2F3542',
+    marginBottom: 16,
+    minHeight: 100,
+    textAlignVertical: 'top',
+  },
   pickerContainer: {
-    backgroundColor: "#D3D3D3",
-    paddingHorizontal: 10,
-    paddingVertical: 5, 
-    alignItems: 'center',
-    borderRadius: 10,
-    marginTop: 10,
+    backgroundColor: '#F4F6FA',
+    borderRadius: 12,
+    marginBottom: 16,
+    overflow: 'hidden',
   },
   picker: {
-    height: 60,
+    height: 50,
     width: '100%',
   },
-
-  /** Date picker row */
-  dateRow: {
+  dateContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: "#d3d3d3",
-    borderRadius: 10,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    marginTop: 10,
     justifyContent: 'space-between',
+    backgroundColor: '#F4F6FA',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    marginBottom: 16,
+  },
+  dateText: {
+    fontSize: 16,
+    color: '#2F3542',
   },
   calendarIcon: {
-    width: 25,
-    height: 25,
-  },
-
-  /** Sub-goal row display */
-  subGoalRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginVertical: 5,
-  },
-  subGoalText: {
-    fontSize: 14,
-    fontFamily: Fonts.REGULAR,
-  },
-  removeSubGoalText: {
-    fontSize: 14,
-    color: 'red',
-    fontFamily: Fonts.BOLD,
-  },
-
-  /** Row for adding a new sub-goal */
-  subGoalInputRow: {
-    // width: '100%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  addSubGoalBtn: {
-    backgroundColor: Colors.primary,
-    marginLeft: 10,
-    padding: 10,
-    borderRadius: 8,
-  },
-  addSubGoalBtnText: {
-    color: 'white',
-    fontSize: 16,
-    fontFamily: Fonts.BOLD,
-  },
-
-  /** Create Task button */
-  createBtn: {
-    backgroundColor: Colors.primary,
-    padding: 15,
-    borderRadius: 10,
-    marginTop: 25,
-    marginHorizontal: 20,
-  },
-  createBtnText: {
-    color: 'white',
-    textAlign: 'center',
-    fontFamily: Fonts.MEDIUM,
-    fontSize: 16,
+    width: 24,
+    height: 24,
+    tintColor: '#57606F',
   },
   priorityRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 10,
+    marginBottom: 16,
   },
   priorityPickerContainer: {
     flex: 1,
-    backgroundColor: "#D3D3D3",
-    // paddingVertical: 5,
-    borderRadius: 5,
-  },
-  priorityPicker: {
-    height: 60,
-    width: '100%',
-    paddingVertical: 5,
+    backgroundColor: '#F4F6FA',
+    borderRadius: 12,
+    marginRight: 12,
+    overflow: 'hidden',
   },
   priorityColorBox: {
-    width: 60,
-    height: 60,
-    marginLeft: 10,
+    width: 40,
+    height: 40,
     borderRadius: 8,
   },
-  dateTimeDisplay: {
-    backgroundColor: "#D3D3D3",
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    paddingVertical: 10,
+  switchRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 10,
+    marginBottom: 12,
+  },
+  switchLabel: {
+    fontSize: 16,
+    color: '#2F3542',
+    flex: 1,
+  },
+  subGoalContainer: {
+    marginBottom: 16,
+  },
+  subGoalRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#F4F6FA',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    marginBottom: 8,
+  },
+  subGoalText: {
+    fontSize: 16,
+    color: '#2F3542',
+    flex: 1,
+  },
+  removeButton: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  removeText: {
+    fontSize: 14,
+    color: '#FF4757',
+    fontWeight: '500',
+  },
+  subGoalInputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  subGoalInput: {
+    flex: 1,
+    backgroundColor: '#F4F6FA',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 16,
+    color: '#2F3542',
+    marginRight: 12,
+  },
+  addButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#2ED573',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  addButtonText: {
+    fontSize: 24,
+    color: 'white',
+    fontWeight: '500',
+  },
+  createButton: {
+    backgroundColor: '#2ED573',
+    borderRadius: 12,
+    paddingVertical: 16,
+    alignItems: 'center',
+    marginVertical: 24,
+  },
+  createButtonText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: 'white',
   },
 });

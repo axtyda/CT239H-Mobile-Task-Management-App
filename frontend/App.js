@@ -6,8 +6,22 @@ import Navigation from './Navigation/Navigation'
 import InitialScreen from './Screens/InitialScreen/InitialScreen';
 import AddTask from './Screens/Task/AddTask';
 import Task from './Screens/Task/Task';
+import * as Notifications from 'expo-notifications';
 
 const Stack = createStackNavigator();
+
+const initializeNotifications = async () => {
+  await Notifications.requestPermissionsAsync();
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: false,
+      shouldSetBadge: false,
+    }),
+  });
+};
+
+initializeNotifications();
 
 export default function App() {
   return (

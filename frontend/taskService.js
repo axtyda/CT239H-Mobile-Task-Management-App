@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
-// import { scheduleTaskNotifications } from './NotificationService';
+import { scheduleTaskNotifications } from './NotificationService';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -125,7 +125,7 @@ const TaskService = {
       };
   
       // Now schedule notifications for this task.
-      // await scheduleTaskNotifications(plainTask);
+      await scheduleTaskNotifications(plainTask);
       return newTask;
     } catch (error) {
       console.error('Error adding task:', error);

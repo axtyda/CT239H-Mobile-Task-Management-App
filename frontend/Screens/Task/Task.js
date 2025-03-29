@@ -17,7 +17,7 @@ import TaskService from '../../taskService';
 import TaskItem from './TaskItem';
 import addMonths from 'date-fns/addMonths';
 import subMonths from 'date-fns/subMonths';
-import Icon from 'react-native-vector-icons/Feather';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 // Enable LayoutAnimation on Android
 if (Platform.OS === 'android') {
@@ -421,7 +421,7 @@ export default function Task() {
 
       {/* FAB */}
       <TouchableOpacity onPress={goToTask} style={styles.stickyCircle}>
-        <Image source={AddImg} style={styles.addImg} />
+        <Icon name="add" size={28} color="white" />
       </TouchableOpacity>
     </View>
   );
