@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { notificationImg, UserProfile } from '../../theme/Images';
 import { styles } from './Style/ProfileStyle';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Profile() {
   // Fields

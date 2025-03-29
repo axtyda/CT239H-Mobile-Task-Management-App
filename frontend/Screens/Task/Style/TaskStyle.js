@@ -77,9 +77,9 @@ export const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   taskInfoContainer: {
-    flexDirection: 'column',
-    alignItems: 'flex-end',
+    // flexDirection: 'column',
     marginTop: 8,
+    // backgroundColor: 'blue'
   },
   taskTitle: {
     fontSize: 18,
@@ -125,23 +125,30 @@ export const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: Fonts.BOLD,
     color: "#444",
+    // backgroundColor: 'red'
   },
   taskDate: {
     fontSize: 13,
     fontFamily: Fonts.BOLD,
-    color: '#555' || '#555'
+    color: '#555' || '#555',
   },
   dateRow: { // Added for horizontal layout
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'flex-end',
-    flexWrap: 'wrap', // Allows wrapping if too long
+    justifyContent: 'space-between',
+    // flexWrap: 'wrap', // Allows wrapping if too long
+    // backgroundColor: 'black'
   },
   dateSeparator: { // Added for the dashes
     fontSize: 13,
     fontFamily: Fonts.BOLD,
     color: '#555',
-    marginHorizontal: 47,
+    marginHorizontal: 10,
+  },
+  timeRow: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    // marginTop: 4,
   },
   customCalendar: {
     backgroundColor: 'white',

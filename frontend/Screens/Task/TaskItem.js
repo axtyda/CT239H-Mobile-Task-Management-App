@@ -28,7 +28,7 @@ const TaskItem = React.memo(({ item, onRefresh }) => {
     }
   };
 
-  // Check if startDate and dueDate are the same
+  // Check if startDate and dueDate are the same (using string comparison as formatted in formatTasks)
   const isSameDate = item.startDate === item.dueDate;
 
   return (
@@ -57,15 +57,26 @@ const TaskItem = React.memo(({ item, onRefresh }) => {
           </View>
         )}
       </View>
+      
+      {/* Task Info */}
       <View style={styles.taskInfoContainer}>
-        <View style={styles.dateRow}>
-          {!isSameDate && (
+        {isSameDate ? (
+          // If the dates are the same, show only Due date aligned to the right
+          <View style={[styles.dateRow, { justifyContent: 'flex-end' }]}>
+            <Text style={styles.taskDate}>Due: {item.dueDate}</Text>
+          </View>
+        ) : (
+          // Otherwise, show both Start and Due dates
+          <View style={styles.dateRow}>
             <Text style={styles.taskDate}>Start: {item.startDate}</Text>
-          )}
-          {!isSameDate && <Text style={styles.dateSeparator}></Text>}
-          <Text style={styles.taskDate}>Due: {item.dueDate}</Text>
+            <Text style={styles.dateSeparator}> | </Text>
+            <Text style={styles.taskDate}>Due: {item.dueDate}</Text>
+          </View>
+        )}
+        {/* Time always at the right edge */}
+        <View style={styles.timeRow}>
+          <Text style={styles.taskTime}>{item.time}</Text>
         </View>
-        <Text style={styles.taskTime}>{item.time}</Text>
       </View>
     </View>
   );

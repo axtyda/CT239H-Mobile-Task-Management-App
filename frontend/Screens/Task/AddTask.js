@@ -12,10 +12,10 @@ import {
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Picker } from '@react-native-picker/picker';
-
-import TaskService from '../../taskService';
 import { styles } from './Style/AddTaskStyle';
 import { backArrowImg, calenderImg } from '../../theme/Images';
+import TaskService from '../../taskService';
+import { v4 as uuidv4 } from 'uuid';
 
 export default function AddTask({ navigation }) {
   const goBack = () => {
@@ -47,6 +47,14 @@ export default function AddTask({ navigation }) {
   // Sub-goals
   const [subGoals, setSubGoals] = useState([]);
   const [newSubGoalName, setNewSubGoalName] = useState('');
+
+  const [notificationOffset, setNotificationOffset] = useState('1-hour');
+  const [enableRecurringReminder, setEnableRecurringReminder] = useState(false);
+  const [recurringFrequency, setRecurringFrequency] = useState('hourly');
+
+  const offsetOptions = [
+    '1-hour', '2-hour', '1-day', '2-day', '1-week', '2-week', '1-month',];
+  const frequencyOptions = ['hourly', 'daily', 'weekly'];
 
   // Helper to color the priority preview box
   const getPriorityColor = (level) => {
@@ -112,7 +120,7 @@ export default function AddTask({ navigation }) {
   // Add sub-goal
   const addSubGoal = () => {
     if (newSubGoalName.trim() !== '') {
-      const newId = Date.now();
+      const newId = Date.now().toString();
       setSubGoals([
         ...subGoals,
         { subGoalId: newId, name: newSubGoalName, isCompleted: false },
@@ -147,13 +155,16 @@ export default function AddTask({ navigation }) {
     }
 
     const newTask = {
-      id: Date.now(),
+      id: Date.now().toString(), // Unique ID for the task
       title,
       description,
       priorityLevel,
       startDate,
       dueDate,
       notificationType,
+      notificationOffset,
+      enableRecurringReminder,
+      recurringFrequency: enableRecurringReminder ? recurringFrequency : '',
       subGoals,
       createdAt: new Date(),
     };
@@ -313,6 +324,40 @@ export default function AddTask({ navigation }) {
             <Picker.Item label="None" value="" />
           </Picker>
         </View>
+      </View>
+
+      <View style={styles.inputWrapper}>
+        <Text style={styles.label}>Reminder Before Deadline</Text>
+        <Picker
+          selectedValue={notificationOffset}
+          onValueChange={(value) => setNotificationOffset(value)}
+          style={styles.picker}
+        >
+          {offsetOptions.map((opt) => (
+            <Picker.Item key={opt} label={opt.replace('-', ' ')} value={opt} />
+          ))}
+        </Picker>
+      </View>
+
+      <View style={styles.inputWrapper}>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <Text style={styles.label}>Enable Regular Reminders</Text>
+          <Switch
+            value={enableRecurringReminder}
+            onValueChange={setEnableRecurringReminder}
+          />
+        </View>
+        {enableRecurringReminder && (
+          <Picker
+            selectedValue={recurringFrequency}
+            onValueChange={(value) => setRecurringFrequency(value)}
+            style={styles.picker}
+          >
+            {frequencyOptions.map((freq) => (
+              <Picker.Item key={freq} label={freq} value={freq} />
+            ))}
+          </Picker>
+        )}
       </View>
 
       {/* Sub-Goals */}

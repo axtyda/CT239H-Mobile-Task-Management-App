@@ -11,7 +11,7 @@ import {
 import { styles } from './Style/HomeStyle';
 import { notificationImg, UserProfile } from '../../theme/Images';
 import TaskService from '../../taskService';
-import Realm from 'realm';
+import { wipeRealmData } from '../../realmSchema'
 
 /** -------------------------------
  *  Helper Functions
@@ -50,52 +50,6 @@ const isWithin12Hours = (dueDate) => {
 /**
  * Wipe all data from Realm using your new schema.
  * If you have a separate SubGoal schema, include it here as well.
- */
-const wipeRealmData = async () => {
-  try {
-    // Example new schema (Task + optional SubGoal). Adjust if needed.
-    const SubGoalSchema = {
-      name: 'SubGoal',
-      primaryKey: 'subGoalId',
-      properties: {
-        subGoalId: 'int',
-        name: 'string',
-        isCompleted: { type: 'bool', default: false },
-      },
-    };
-
-    const TaskSchema = {
-      name: 'Task',
-      primaryKey: 'id',
-      properties: {
-        id: 'int',
-        title: 'string',
-        description: 'string',
-        priorityColor: 'string',
-        startDate: 'date',
-        dueDate: 'date',
-        notificationType: 'string?',
-        subGoals: { type: 'list', objectType: 'SubGoal' },
-        createdAt: { type: 'date', default: new Date() },
-      },
-    };
-
-    const realm = await Realm.open({
-      schema: [SubGoalSchema, TaskSchema],
-      schemaVersion: 7, // or higher if you already used 4
-      path: 'myCustomRealm.realm',
-    });
-    realm.write(() => {
-      realm.deleteAll();
-    });
-    realm.close();
-    console.log('Realm data wiped!');
-    Alert.alert('Data wiped!', 'All tasks have been deleted.');
-  } catch (error) {
-    console.error('Error wiping Realm data:', error);
-    Alert.alert('Error', 'Could not wipe the data.');
-  }
-};
 
 /** 
  * Important Task Item
@@ -176,34 +130,39 @@ export default function Home({ navigation }) {
   const [activeTab, setActiveTab] = useState('All');
 
   // Sample test data
-  const addTestData = async () => {
-    // 1st Task (due in 8 hours)
-    await TaskService.addTask({
-      title: 'Buy Groceries',
-      description: 'Milk, Bread, Eggs, and Fruits',
-      priorityLevel: 'Red',
-      startDate: new Date(Date.now() + 8 * 60 * 60 * 1000),
-      dueDate: new Date(Date.now() + 8 * 60 * 60 * 1000),
-      notificationType: 'push',
-      subGoals: [
-        { subGoalId: Date.now(), name: 'Buy milk', isCompleted: false },
-      ],
-    });
-  };
+  // const addTestData = async () => {
+  //   // 1st Task (due in 8 hours)
+  //   await TaskService.addTask({
+  //     title: 'Buy Groceries',
+  //     description: 'Milk, Bread, Eggs, and Fruits',
+  //     priorityLevel: 'Red',
+  //     startDate: new Date(Date.now() + 8 * 60 * 60 * 1000),
+  //     dueDate: new Date(Date.now() + 8 * 60 * 60 * 1000),
+  //     notificationType: 'push',
+  //     subGoals: [
+  //       { subGoalId: Date.now(), name: 'Buy milk', isCompleted: false },
+  //     ],
+  //   });
+  // };
 
   // Fetch tasks from Realm
   const fetchTasks = async () => {
     let allTasks = await TaskService.getAllTasks();
-
+    console.log('Fetched tasks:', JSON.stringify(allTasks, null, 2));
     // If no tasks exist, add test data
-    if (allTasks.length === 0) {
-      await addTestData();
-      allTasks = await TaskService.getAllTasks();
-    }
+    // if (allTasks.length === 0) {
+    //   // await addTestData();
+    //   allTasks = await TaskService.getAllTasks();
+    // }
+
+    const plainTasks = Array.from(allTasks).map(task => ({
+      ...task,
+      subGoals: task.subGoals ? task.subGoals.map(sg => ({ ...sg })) : [],
+    }));
 
     // Convert to a plain array
-    setTasks(Array.from(allTasks));
-    setFilteredTasks(Array.from(allTasks));
+    setTasks(plainTasks);
+    setFilteredTasks(plainTasks);
   };
 
   useEffect(() => {

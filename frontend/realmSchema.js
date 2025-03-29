@@ -1,59 +1,82 @@
 import Realm from 'realm';
+import { v4 as uuidv4 } from 'uuid'; // Optional: if you prefer UUIDs
 
-/** SubGoal Schema (unchanged) */
 export const SubGoalSchema = {
   name: 'SubGoal',
   primaryKey: 'subGoalId',
   properties: {
-    subGoalId: 'int',
+    subGoalId: 'string',
     name: 'string',
     isCompleted: { type: 'bool', default: false },
   },
 };
 
-/** 
- * Task Schema updated to include a startDate field.
- * Note: The startDate field is added with a default value of new Date().
- */
 export const TaskSchema = {
   name: 'Task',
   primaryKey: 'id',
   properties: {
-    id: 'int',
+    id: 'string',
     title: 'string',
     description: 'string',
-    priorityLevel: 'string', // "Red", "Yellow", "Blue", "Green"
+    priorityLevel: 'string',
     dueDate: 'date',
-    startDate: 'date', // New field added
+    startDate: 'date',
     notificationType: 'string?',
+    notificationOffset: 'string?',
+    enableRecurringReminder: { type: 'bool', default: false },
+    recurringFrequency: 'string?',
     subGoals: { type: 'list', objectType: 'SubGoal' },
-    createdAt: { type: 'date', default: new Date() },
+    createdAt: { type: 'date', default: () => new Date() },
+    notificationIds: { type: 'list', objectType: 'string', default: [] },
+    finishedStatus: { type: 'string', default: 'not-started' }, // Added
   },
 };
 
-/** 
- * Open Realm in React Native 
- * - Schema version is bumped to 6.
- * - A migration function is added to update existing Task objects.
- */
 export const openRealm = async () => {
-  return await Realm.open({
-    schema: [SubGoalSchema, TaskSchema],
-    schemaVersion: 7, // Bump schema version to 6
-    path: 'myCustomRealm.realm',
-    migration: (oldRealm, newRealm) => {
-      // Perform migration only if upgrading from a version less than 6.
-      if (oldRealm.schemaVersion < 6) {
-        const oldObjects = oldRealm.objects('Task');
-        const newObjects = newRealm.objects('Task');
-        // For each Task object, set the new startDate property if not already set.
-        for (let i = 0; i < oldObjects.length; i++) {
-          if (!newObjects[i].startDate) {
-            // Use the createdAt value as a fallback default, or new Date() if needed.
-            newObjects[i].startDate = oldObjects[i].createdAt || new Date();
-          }
+  try {
+    const realm = await Realm.open({
+      schema: [SubGoalSchema, TaskSchema],
+      schemaVersion: 1, // Increment schema version
+      path: 'myCustomRealm.realm',
+      migration: (oldRealm, newRealm) => {
+        if (oldRealm.schemaVersion < 1) {
+          console.log("Starting Realm migration...");
+          const tasks = newRealm.objects('Task');
+          
+          tasks.forEach((task, index) => {
+            // Generate UUID for Task ID if missing/empty
+            if (!task.id || task.id.trim() === '') {
+              task.id = uuidv4();
+            }
+            
+            // Process SubGoals
+            task.subGoals.forEach((subGoal, subIndex) => {
+              // Always generate new UUID for subGoalId to ensure uniqueness
+              subGoal.subGoalId = uuidv4();
+            });
+            
+            // Set other defaults (unchanged)
+            task.notificationIds = task.notificationIds || [];
+            task.finishedStatus = task.finishedStatus || 'not-started';
+            // ... (rest of the property checks)
+          });
+          
+          console.log("Migration completed successfully.");
         }
-      }
-    },
+      },
+    });
+    return realm;
+  } catch (error) {
+    console.error('Error opening Realm:', error);
+    throw error;
+  }
+};
+
+export const wipeRealmData = async () => {
+  const realm = await openRealm();
+  realm.write(() => {
+    realm.deleteAll();
   });
+  realm.close();
+  console.log('Realm data wiped!');
 };
