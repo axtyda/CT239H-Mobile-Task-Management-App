@@ -16,14 +16,36 @@ export const styles = StyleSheet.create({
     backgroundColor: '#2ED573',
     padding: 16,
     paddingTop: 30,
-    borderBottomLeftRadius: 16,
-    borderBottomRightRadius: 16,
+    borderBottomLeftRadius: 30, // Increased curve radius
+    borderBottomRightRadius: 30, // Increased curve radius
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 }, // Increased offset
+    shadowOpacity: 0.15, // Increased opacity
+    shadowRadius: 10, // Increased shadow radius
+    elevation: 6, // Increased elevation for Android
+    marginBottom: 8, // Add a small margin to create space below header
+    position: 'relative', // Make position relative for pseudo-elements
+  },
+  
+  // Add a subtle wave effect with the container
+  headerWave: {
+    position: 'absolute',
+    bottom: -25,
+    left: 0,
+    right: 0,
+    height: 35, // Height of the wave effect
+    backgroundColor: '#2ED573',
+    borderBottomLeftRadius: 60, // Create a more pronounced curve
+    borderBottomRightRadius: 60,
+    opacity: 0.4, // Make it semi-transparent
+    zIndex: -1, // Place it behind the main header
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 3,
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
+  
   profileSection: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -88,6 +110,7 @@ export const styles = StyleSheet.create({
   // Scroll container
   scrollContainer: {
     padding: 20,
+    paddingTop: 25, // Added more padding at top for better visual transition
     paddingBottom: 100,
   },
   
