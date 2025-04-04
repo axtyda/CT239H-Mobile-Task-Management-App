@@ -1,0 +1,48 @@
+# Node modules
+/frontend/node_modules/
+
+# Expo
+/frontend/.expo/
+/frontend/.expo-shared/
+frontend/.expo/*
+frontend/web-build/
+
+# Metro bundler cache
+/frontend/.metro-cache/
+
+# Misc
+/frontend/.env
+/frontend/.env.local
+/frontend/npm-debug.log*
+/frontend/yarn-debug.log*
+/frontend/yarn-error.log*
+/frontend/package-lock.json
+/frontend/expo-debug.log
+
+# Android build
+/frontend/android/
+/frontend/android/.gradle/
+/frontend/android/app/build/
+/frontend/android/build/
+frontend/android/.idea/
+
+# iOS (if exists)
+/frontend/ios/build/
+/frontend/ios/Pods/
+
+# OS/IDE/editor
+.DS_Store
+*.swp
+.idea/
+.vscode/
+
+
+# Backend Node
+/backend/node_modules/
+/backend/.env
+
+# Backend Python
+/backend/venv/
+/backend/env/
+/backend/__pycache__/
+/backend/.env

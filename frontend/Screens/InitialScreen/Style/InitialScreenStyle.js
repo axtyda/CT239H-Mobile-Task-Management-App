@@ -1,0 +1,47 @@
+import { StyleSheet } from "react-native";
+import { Fonts } from "../../../theme/Fonts";
+import { Colors } from "../../../theme";
+
+export const InitialScreenStyle = StyleSheet.create({
+    container:{
+        flex:1,
+        backgroundColor:Colors.background,
+        padding:20
+    },
+    mainContainer:{
+        flex:1,
+        flexDirection:"column",
+        justifyContent:"space-between"
+    },
+    img:{
+        width:'100%',
+        height:300
+    },
+    text:{
+        fontSize:25,
+        color:Colors.text_alt,
+        fontFamily:Fonts.BOLD,
+        marginTop:30
+    },
+    textSub:{
+        textAlign:"center",
+        marginTop:10,
+        fontSize:15,
+        color:Colors.text_alt,
+        fontFamily:Fonts.MEDIUM
+    },
+    btn:{
+        backgroundColor:Colors.primary,
+        padding:15,
+        borderRadius:10,
+        marginTop:50
+    },
+    btnText:{
+        color:"white",
+        textAlign:"center",
+        fontFamily:Fonts.MEDIUM
+    },
+    statusbar: {
+        backgroundColor: "#005B41"
+    }
+})
