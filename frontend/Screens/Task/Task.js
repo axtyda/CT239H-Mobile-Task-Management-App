@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
   View,
   Text,
@@ -8,13 +8,13 @@ import {
   LayoutAnimation,
   UIManager,
   Platform,
-  ScrollView
+  ScrollView,
+  TextInput
 } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { styles } from './Style/TaskStyle';
-import { notificationImg, UserProfile, AddImg } from '../../theme/Images';
+import { UserProfile } from '../../theme/Images';
 import TaskService from '../../taskService';
-import TaskItem from './TaskItem';
 import addMonths from 'date-fns/addMonths';
 import subMonths from 'date-fns/subMonths';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -37,6 +37,10 @@ export default function Task() {
   const navigation = useNavigation();
 
   // State
+  const [searchVisible, setSearchVisible] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const searchInputRef = useRef(null);
   const [tasks, setTasks] = useState([]);
   const [items, setItems] = useState({});
   const [loading, setLoading] = useState(true);
@@ -46,30 +50,56 @@ export default function Task() {
   const [daysInMonth, setDaysInMonth] = useState([]);
   const [weekDays] = useState(['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']);
 
+
+  const handleSearch = (text) => {
+    setSearchQuery(text);
+
+    if (text.trim() === '') {
+      setSearchResults([]);
+      return;
+    }
+
+    // Search across all tasks, not just the selected date
+    const results = tasks.filter(task =>
+      task.title.toLowerCase().includes(text.toLowerCase())
+    );
+
+    setSearchResults(formatTasks(results));
+  };
+
+  const toggleSearch = () => {
+    const newSearchVisible = !searchVisible;
+    setSearchVisible(newSearchVisible);
+
+    if (!newSearchVisible) {
+      setSearchQuery('');
+      setSearchResults([]);
+    }
+  };
   // Format tasks using toLocaleString
   const formatTasks = useCallback((tasksArray) => {
     const formattedTasks = {};
     tasksArray.forEach((task) => {
       if (!task || !task.dueDate) return;
-      
+
       // Convert dates into Date objects if needed
       const dueDateObj = new Date(task.dueDate);
       const startDateObj = new Date(task.startDate);
       const dateKey = getDateKey(dueDateObj);
-      
+
       // Format dates as readable strings
       const formattedStartDate = startDateObj.toLocaleString([], { month: 'long', day: 'numeric', year: 'numeric' });
       const formattedDueDate = dueDateObj.toLocaleString([], { month: 'long', day: 'numeric', year: 'numeric' });
       const formattedTime = dueDateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      
+
       if (!formattedTasks[dateKey]) {
         formattedTasks[dateKey] = [];
       }
-      
+
       formattedTasks[dateKey].push({
         id: task.id,
-        name: task.title, // For TaskItem title display
-        task: task.description, // For TaskItem description
+        title: task.title,
+        description: task.description,
         startDate: formattedStartDate,
         dueDate: formattedDueDate,
         time: formattedTime,
@@ -105,23 +135,9 @@ export default function Task() {
 
   useFocusEffect(
     useCallback(() => {
-      const fetchTasks = async () => {
-        setLoading(true);
-        try {
-          const allTasks = await TaskService.getAllTasks();
-          setTasks(allTasks);
-          setItems(formatTasks(allTasks));
-        } catch (error) {
-          console.error('Error retrieving tasks:', error);
-          setTasks([]);
-          setItems({});
-        } finally {
-          setLoading(false);
-        }
-      };
       fetchTasks();
       console.log('Fetching tasks on focus...');
-    }, [formatTasks])
+    }, [fetchTasks])
   );
 
   // Generate the monthly calendar data
@@ -206,7 +222,6 @@ export default function Task() {
     const dateKey = getDateKey(selectedDate);
     return items[dateKey] || [];
   }, [items, selectedDate]);
-  
 
   // Check if a date has tasks
   const hasTask = (date) => {
@@ -321,106 +336,243 @@ export default function Task() {
     );
   };
 
+  // Get background color based on priority level - similar to Home.js
+  const getPriorityColor = (priorityLevel) => {
+    switch (priorityLevel) {
+      case 'Red':
+        return '#FF4757'; // Urgent and Important
+      case 'Yellow':
+        return '#FFD93D'; // Not Urgent but Important
+      case 'Blue':
+        return '#2F89FC'; // Urgent but Not Important
+      case 'Green':
+      default:
+        return '#2ED573'; // Not Urgent and Not Important
+    }
+  };
+
+  // Toggle Subgoal completion
+  const toggleSubGoal = async (taskId, subGoalId) => {
+    try {
+      await TaskService.updateSubGoal(taskId, subGoalId);
+      fetchTasks(); // Refresh tasks to show updates
+    } catch (error) {
+      console.error("Error updating subgoal:", error);
+    }
+  };
+
+  // Task Card component (similar to Home.js but with subgoals)
+  const TaskCard = ({ task }) => {
+    // Check if startDate is null or the same as dueDate
+    const shouldShowSingleDate = !task.startDate || task.startDate === task.dueDate;
+    const priorityColor = getPriorityColor(task.priorityLevel);
+
+    return (
+      <View style={styles.taskCard}>
+        <View style={styles.taskContent}>
+          {/* Task title with priority indicator as background and left border */}
+          <View style={[
+            styles.taskTitleContainer,
+            {
+              backgroundColor: priorityColor + '20',
+              borderLeftWidth: 4,
+              borderLeftColor: priorityColor,
+              borderRightWidth: 4,
+              borderRightColor: priorityColor,
+            }
+          ]}>
+            <Text style={styles.taskTitle}>{task.title}</Text>
+          </View>
+
+          {task.description && (
+            <Text style={styles.taskDescription} numberOfLines={2}>
+              {task.description}
+            </Text>
+          )}
+
+          {/* Task date and time metadata */}
+          <View style={styles.taskMeta}>
+            {/* Due date with icon */}
+            <View style={styles.metaItem}>
+              <Icon name="event" size={16} color="#57606F" />
+              <Text style={styles.taskMetaText}>
+                {shouldShowSingleDate ? task.dueDate : `${task.startDate} - ${task.dueDate}`}
+              </Text>
+            </View>
+
+            {/* Time with icon */}
+            <View style={styles.metaItem}>
+              <Icon name="access-time" size={16} color="#57606F" />
+              <Text style={styles.taskMetaText}>{task.time}</Text>
+            </View>
+          </View>
+
+          {/* Subgoals section with checkboxes on the right */}
+          {task.subGoals && task.subGoals.length > 0 && (
+            <View style={styles.subGoalsContainer}>
+              {task.subGoals.map((sub, index) => (
+                <View key={index} style={styles.subGoalRow}>
+                  <Text style={styles.subGoalText}>{sub.name}</Text>
+                  <TouchableOpacity
+                    style={styles.checkbox}
+                    onPress={() => toggleSubGoal(task.id, sub.subGoalId)}
+                  >
+                    {sub.isCompleted && <View style={styles.checkboxTick} />}
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </View>
+          )}
+        </View>
+      </View>
+    );
+  };
+
   // Navigate to AddTask
   const goToTask = useCallback(() => {
     navigation.navigate('AddTask');
   }, [navigation]);
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={styles.container}>
       {/* Header */}
       <View style={styles.taskView}>
-        <View style={styles.profileView}>
-          <Image source={UserProfile} style={styles.userProfile} />
-          <View style={styles.details}>
-            <Text style={styles.mesText}>Task List</Text>
-            <Text style={styles.taskText}>Upcoming Task</Text>
-          </View>
-        </View>
-        <TouchableOpacity>
-          <Image source={notificationImg} style={styles.notiImg} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={fetchTasks} style={{ marginRight: 10 }}>
-          <Text style={{ color: 'blue' }}>Refresh</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => { setCurrentMonth(new Date()); setSelectedDate(new Date()); }} style={{ marginRight: 10 }}>
-          <Text style={{ color: 'blue' }}>Today</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Calendar / Agenda */}
-      <View style={styles.calenderView}>
-        {loading ? (
-          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <ActivityIndicator size='large' color='#20bf55' />
-            <Text style={{ marginTop: 10 }}>Loading tasks...</Text>
-          </View>
-        ) : (
-          <View style={styles.mainCalenderView}>
-            {/* Collapsed vs Expanded */}
-            {!isCalendarExpanded ? (
-              <View style={styles.calendarContainer}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                  <TouchableOpacity onPress={() => changeMonth('prev')} style={{ padding: 10 }}>
-                    <Icon name='chevron-left' size={24} color='#333' />
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={isCalendarExpanded ? collapseCalendar : expandCalendar}>
-                    <Text style={styles.monthYearText}>
-                      {currentMonth.toLocaleString([], { month: 'long', year: 'numeric' })}
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={() => changeMonth('next')} style={{ padding: 10 }}>
-                    <Icon name='chevron-right' size={24} color='#333' />
-                  </TouchableOpacity>
-                </View>
-                {renderWeekView()}
-              </View>
-            ) : (
-              <View style={styles.calendarContainer}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                  <TouchableOpacity onPress={() => changeMonth('prev')} style={{ padding: 10 }}>
-                    <Icon name='chevron-left' size={24} color='#333' />
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={isCalendarExpanded ? collapseCalendar : expandCalendar}>
-                    <Text style={styles.monthYearText}>
-                      {currentMonth.toLocaleString([], { month: 'long', year: 'numeric' })}
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={() => changeMonth('next')} style={{ padding: 10 }}>
-                    <Icon name='chevron-right' size={24} color='#333' />
-                  </TouchableOpacity>
-                </View>
-                {renderMonthlyCalendar()}
-              </View>
-            )}
-
-            {/* Tasks List */}
-            <View style={styles.taskListContainer}>
-              {getTasksForSelectedDate.length > 0 ? (
-                <ScrollView
-                  contentContainerStyle={styles.scrollContent}
-                  showsVerticalScrollIndicator={true}
-                >
-                  {getTasksForSelectedDate.map((task, index) => (
-                    <TaskItem
-                      key={`task-${task.id}-${index}`}
-                      item={task}
-                      onRefresh={fetchTasks}
-                    />
-                  ))}
-                </ScrollView>
-              ) : (
-                <View style={styles.emptyTaskContainer}>
-                  <Text style={styles.emptyTaskText}>No tasks for this day</Text>
-                </View>
-              )}
+        {/* Hide profile when search is visible */}
+        {!searchVisible ? (
+          <View style={styles.profileView}>
+            <Image source={UserProfile} style={styles.userProfile} />
+            <View style={styles.details}>
+              <Text style={styles.mesText}>Task List</Text>
+              <Text style={styles.taskText}>Upcoming Task</Text>
             </View>
           </View>
+        ) : (
+          <View style={styles.headerSearchContainer}>
+            <View style={styles.searchInputWrapper}>
+              <Icon name="search" size={18} color="rgba(255, 255, 255, 0.7)" />
+              <TextInput
+                ref={searchInputRef}
+                style={styles.headerSearchInput}
+                placeholder="Search tasks..."
+                placeholderTextColor="rgba(255, 255, 255, 0.7)"
+                value={searchQuery}
+                onChangeText={handleSearch}
+                autoFocus={true}
+              />
+            </View>
+
+            {searchQuery.length > 0 && (
+              <TouchableOpacity onPress={() => handleSearch('')} style={styles.clearSearch}>
+                <Icon name="close" size={18} color="white" />
+              </TouchableOpacity>
+            )}
+          </View>
+        )}
+
+        <View style={styles.headerActions}>
+          {/* Add search toggle button */}
+          <TouchableOpacity onPress={toggleSearch} style={styles.headerButton}>
+            <Icon name={searchVisible ? "close" : "search"} size={22} color="white" />
+          </TouchableOpacity>
+
+          {!searchVisible && (
+            <>
+              <TouchableOpacity onPress={fetchTasks} style={styles.headerButton}>
+                <Icon name="refresh" size={22} color="white" />
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => { setCurrentMonth(new Date()); setSelectedDate(new Date()); }}
+                style={styles.headerButton}
+              >
+                <Icon name="today" size={22} color="white" />
+              </TouchableOpacity>
+            </>
+          )}
+        </View>
+      </View>
+
+      {/* Main Content */}
+      <View style={styles.mainContainer}>
+        {loading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#20bf55" />
+            <Text style={styles.loadingText}>Loading tasks...</Text>
+          </View>
+        ) : (
+          <ScrollView
+            style={{ flex: 1 }}
+            contentContainerStyle={{ paddingBottom: 20 }}
+            showsVerticalScrollIndicator={false}
+          >
+            <View style={styles.contentContainer}>
+              {searchVisible && searchQuery.length > 0 ? (
+                <View style={styles.searchResultsContainer}>
+                  <Text style={styles.sectionTitle}>Search Results</Text>
+                  {Object.values(searchResults).flat().length > 0 ? (
+                    Object.values(searchResults).flat().map((task, index) => (
+                      <TaskCard key={`search-task-${task.id}-${index}`} task={task} />
+                    ))
+                  ) : (
+                    <View style={styles.emptyTaskContainer}>
+                      <Text style={styles.emptyTaskText}>No matching tasks found</Text>
+                    </View>
+                  )}
+                </View>
+              ) : (
+                <>
+                  <View style={styles.calendarContainer}>
+                    <View style={styles.calendarHeader}>
+                      <TouchableOpacity
+                        onPress={() => changeMonth("prev")}
+                        style={styles.monthNavButton}
+                      >
+                        <Icon name="chevron-left" size={24} color="#333" />
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={isCalendarExpanded ? collapseCalendar : expandCalendar}
+                      >
+                        <Text style={styles.monthYearText}>
+                          {currentMonth.toLocaleString([], {
+                            month: "long",
+                            year: "numeric",
+                          })}
+                        </Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() => changeMonth("next")}
+                        style={styles.monthNavButton}
+                      >
+                        <Icon name="chevron-right" size={24} color="#333" />
+                      </TouchableOpacity>
+                    </View>
+                    {isCalendarExpanded ? renderMonthlyCalendar() : renderWeekView()}
+                  </View>
+                  <Text style={styles.sectionTitle}>
+                    {selectedDate.toLocaleDateString([], {
+                      weekday: "long",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </Text>
+                  {getTasksForSelectedDate.length > 0 ? (
+                    getTasksForSelectedDate.map((task, index) => (
+                      <TaskCard key={`task-${task.id}-${index}`} task={task} />
+                    ))
+                  ) : (
+                    <View style={styles.emptyTaskContainer}>
+                      <Text style={styles.emptyTaskText}>No tasks for this day</Text>
+                    </View>
+                  )}
+                </>
+              )}
+            </View>
+          </ScrollView>
         )}
       </View>
 
       {/* FAB */}
-      <TouchableOpacity onPress={goToTask} style={styles.stickyCircle}>
+      <TouchableOpacity onPress={goToTask} style={styles.fab}>
         <Icon name="add" size={28} color="white" />
       </TouchableOpacity>
     </View>

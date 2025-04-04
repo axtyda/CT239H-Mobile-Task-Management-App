@@ -112,6 +112,7 @@ export const styles = StyleSheet.create({
     padding: 20,
     paddingTop: 25, // Added more padding at top for better visual transition
     paddingBottom: 100,
+    // backgroundColor: 'black'
   },
   
   // Card styles (common)
