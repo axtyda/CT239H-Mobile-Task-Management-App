@@ -14,8 +14,8 @@ To run this project, you need to install the following dependencies:
 ### Installation
 
 1. Clone or download the source code from the branch "ready" of this repository:
-   git clone -b ready https://github.com/axtyda/CT239H.git
-   cd frontend
+   - git clone -b ready https://github.com/axtyda/CT239H.git
+   - cd frontend
 
 2. Install the required libraries:
    npm install
@@ -28,32 +28,32 @@ To run this project, you need to install the following dependencies:
 ### Usage
 
 1. **Launch the Program**:
-   Run the nien_luan app
-   Press "Enable Notification".
+   - Run the nien_luan app
+   - Press "Enable Notification".
 
 This opens the permission requesting. (Note: this project is currently only work with Android emulator and maybe Android devices)
 
 2. **Press the " + " green icon at the bottom right of Home or Task tab**:
 
-- Enter required infomation.
-- Set priority
-- Set the date & time.
-- Set notification type and option to repeat notify (optional)
-- Add sub-goals (optional) 
-- Press the Add Task button to save.
+   - Enter required infomation.
+   - Set priority
+   - Set the date & time.
+   - Set notification type and option to repeat notify (optional)
+   - Add sub-goals (optional) 
+   - Press the Add Task button to save.
 
 3. **View the tasks**:
 
-- Once added tasks will be show on Home screen and Task screen. 
+   - Once added tasks will be show on Home screen and Task screen. 
 
 4. **Further customization**:
 
-- Head to Profile tab
-- Change name, workplace, email (optional)
-- Change theme, notification settings
+   - Head to Profile tab
+   - Change name, workplace, email (optional)
+   - Change theme, notification settings
 
 
 ## Additional Details
 
-- **No support for iOS**: Due to the inaccessible to Mac device, the development of iOS platform is impossible. 
-- Full source code and updates are available at: https://github.com/axtyda/CT239H/tree/ready
+   - **No support for iOS**: Due to the inaccessible to Mac device, the development of iOS platform is impossible. 
+   - Full source code and updates are available at: https://github.com/axtyda/CT239H/tree/ready
