@@ -31,7 +31,7 @@ To run this project, you need to install the following dependencies:
    - Run the nien_luan app
    - Press "Enable Notification".
 
-This opens the permission requesting. (Note: this project is currently only work with Android emulator and maybe Android devices)
+This opens the permission request message. (Note: this project is currently only work with Android emulator and maybe Android devices)
 
 2. **Press the " + " green icon at the bottom right of Home or Task tab**:
 
@@ -56,4 +56,5 @@ This opens the permission requesting. (Note: this project is currently only work
 ## Additional Details
 
    - **No support for iOS**: Due to the inaccessible to Mac device, the development of iOS platform is impossible. 
+   - **Call notification are not working**: Call notification will not work on a emulator environment
    - Full source code and updates are available at: https://github.com/axtyda/CT239H/tree/ready
