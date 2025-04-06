@@ -20,7 +20,6 @@ frontend/web-build/
 /frontend/expo-debug.log
 
 # Android build
-/frontend/android/
 /frontend/android/.gradle/
 /frontend/android/app/build/
 /frontend/android/build/
