@@ -86,9 +86,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'com.anonymous.nien_luan'
+    namespace 'com.axty.nien_luan'
     defaultConfig {
-        applicationId 'com.anonymous.nien_luan'
+        applicationId 'com.axty.nien_luan'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

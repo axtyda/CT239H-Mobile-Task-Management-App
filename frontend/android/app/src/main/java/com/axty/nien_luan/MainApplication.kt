@@ -1,4 +1,4 @@
-package com.anonymous.nien_luan
+package com.axty.nien_luan
 
 import android.app.Application
 import android.content.res.Configuration
