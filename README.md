@@ -14,8 +14,8 @@ To run this project, you need to install the following dependencies:
 ### Installation
 
 1. Clone or download the source code from the branch "ready" of this repository:
-   - git clone -b ready https://github.com/axtyda/CT239H.git
-   - cd frontend
+   git clone -b ready https://github.com/axtyda/CT239H.git
+   cd frontend
 
 2. Install the required libraries:
    npm install
@@ -28,8 +28,8 @@ To run this project, you need to install the following dependencies:
 ### Usage
 
 1. **Launch the Program**:
-   - Run the nien_luan app
-   - Press "Enable Notification".
+   Run the nien_luan app
+   Press "Enable Notification".
 
 This opens the permission requesting. (Note: this project is currently only work with Android emulator and maybe Android devices)
 
