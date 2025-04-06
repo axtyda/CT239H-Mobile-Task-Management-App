@@ -14,8 +14,8 @@ To run this project, you need to install the following dependencies:
 ### Installation
 
 1. Clone or download the source code from the branch "ready" of this repository:
-   git clone [https://github.com/axtyda/CT239H/tree/ready](https://github.com/axtyda/CT239H/tree/ready)
-   cd frontend
+   - git clone -b ready https://github.com/axtyda/CT239H
+   - cd frontend
 
 2. Install the required libraries:
    npm install
