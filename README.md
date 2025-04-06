@@ -14,7 +14,7 @@ To run this project, you need to install the following dependencies:
 ### Installation
 
 1. Clone or download the source code from the branch "ready" of this repository:
-   - git clone -b ready https://github.com/axtyda/CT239H
+   - git clone -b ready https://github.com/axtyda/CT239H.git
    - cd frontend
 
 2. Install the required libraries:
@@ -56,4 +56,4 @@ This opens the permission requesting. (Note: this project is currently only work
 ## Additional Details
 
 - **No support for iOS**: Due to the inaccessible to Mac device, the development of iOS platform is impossible. 
-- Full source code and updates are available at: [https://github.com/axtyda/CT239H/tree/ready]([https://github.com/axtyda/CT239H/tree/ready]).
+- Full source code and updates are available at: https://github.com/axtyda/CT239H/tree/ready
