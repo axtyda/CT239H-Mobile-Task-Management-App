@@ -22,7 +22,7 @@ To run this project, you need to install the following dependencies:
 
 3. Ensure an Android emulator API 35 is running.
 
-4. Build the application
+4. Build the application:
    npx expo run:android
 
 ### Usage
