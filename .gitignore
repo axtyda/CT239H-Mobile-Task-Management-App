@@ -4,7 +4,7 @@
 node_modules/
 
 # # Expo
-# .expo/
+.expo/
 # dist/
 # web-build/
 # expo-env.d.ts
@@ -36,4 +36,4 @@ node_modules/
 # *.tsbuildinfo
 
 # #builds
-# android/
+android/
